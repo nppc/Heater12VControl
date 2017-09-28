@@ -1,12 +1,18 @@
 
+
 #define OVERSAMPLENR 	16
 
 #define MOSFET_PIN 		13
 #define TEMPSENSOR_PIN 	A1
 #define KNOB_PIN 		A2	// Potentsiomenter for setting the desired temperature
 
+#include <U8g2lib.h>
 #include "temptable.h"
+
 static void* heater_ttbl_map = (void*)TEMPTABLE;
+
+U8G2_SSD1306_96X16_ER_F_HW_I2C u8g2(U8G2_R0);   // EastRising 0.69"
+
 
 // ADC=1023 - temp sensor is not connected
 
@@ -19,7 +25,9 @@ void setup(){
 	H_OFF;
 	pinMode(MOSFET_PIN,OUTPUT);
 	
-	Serial.begin(9600);
+	u8g2.begin();
+	
+	Serial.begin(57600);
 	
 	// test temoerature sensor presense
 	while (analog2temp(collectADCraw(TEMPSENSOR_PIN))>999.0) {
@@ -30,20 +38,50 @@ void setup(){
 	
 }
 
+int last_presetTemp = 0;
+unsigned long disp_hyst_ms = 0;
+unsigned long adjust_hyst_ms = 0;
+unsigned long switch_mosfet_hyst_ms = 0;
+unsigned long serial_mosfet_hyst_ms = 0;
 
 void loop() {
 	
 	int presetTemp = map(collectADCraw(KNOB_PIN),0,1023*OVERSAMPLENR,20,300);
 	float currentTemp = analog2temp(collectADCraw(TEMPSENSOR_PIN));
+
+	if (switch_mosfet_hyst_ms+500 < millis()) {
+		// if preset temperature is near 20, consider allways OFF
+		if ((float)presetTemp>=currentTemp && presetTemp>21) {H_ON;} else {H_OFF;}
+		switch_mosfet_hyst_ms = millis();
+	}	
+
+	if (disp_hyst_ms+700 < millis()) {
+		disp_hyst_ms=millis();
+		u8g2.clearBuffer();
+		u8g2.setFont(u8g2_font_inb16_mr);
+		u8g2.setCursor(0, 15);
+		if (presetTemp < (last_presetTemp-1) || presetTemp > (last_presetTemp+1)) { // add small hysterysis
+			// value is adjusted
+			last_presetTemp = presetTemp;
+			adjust_hyst_ms = millis();
+			u8g2.print("<");
+			u8g2.print(presetTemp);
+			u8g2.print(">");
+		} else if(adjust_hyst_ms+2000 < millis()){
+			u8g2.print(currentTemp);
+		}
+		u8g2.sendBuffer();
+	}	
 	
-	if ((float)presetTemp>=currentTemp) {H_ON;} else {H_OFF;}
-	Serial.print("Set: ");
-	Serial.print(presetTemp);
-	Serial.print(", Actual: ");
-	Serial.println(currentTemp);
-	
-	delay(1000);
-	
+	// debug 
+	if (serial_mosfet_hyst_ms+1000 < millis()) {
+		serial_mosfet_hyst_ms = millis();
+		Serial.print("Set: ");
+		Serial.print(presetTemp);
+		Serial.print(", Actual: ");
+		Serial.println(currentTemp);
+	}	
+
 }
 
 #define PGM_RD_W(x)   (short)pgm_read_word(&x)
