@@ -1,0 +1,312 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:switches
+LIBS:relays
+LIBS:motors
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:Heater12VControl-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Q_NMOS_GDS Q2
+U 1 1 59B2958F
+P 6350 3300
+F 0 "Q2" H 6550 3350 50  0000 L CNN
+F 1 "IRLR3715" H 6550 3250 50  0000 L CNN
+F 2 "TO_SOT_Packages_SMD:TO-252-2_Rectifier" H 6550 3400 50  0001 C CNN
+F 3 "" H 6350 3300 50  0001 C CNN
+	1    6350 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR7
+U 1 1 59B296E2
+P 6450 3600
+F 0 "#PWR7" H 6450 3350 50  0001 C CNN
+F 1 "GND" H 6450 3450 50  0000 C CNN
+F 2 "" H 6450 3600 50  0001 C CNN
+F 3 "" H 6450 3600 50  0001 C CNN
+	1    6450 3600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6450 3600 6450 3500
+$Comp
+L R R3
+U 1 1 59B2972F
+P 5650 3050
+F 0 "R3" V 5730 3050 50  0000 C CNN
+F 1 "2K" V 5650 3050 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603" V 5580 3050 50  0001 C CNN
+F 3 "" H 5650 3050 50  0001 C CNN
+	1    5650 3050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6050 3300 6150 3300
+Wire Wire Line
+	5650 3600 6450 3600
+Connection ~ 6450 3600
+$Comp
+L Conn_01x02 J3
+U 1 1 59B297ED
+P 6650 2800
+F 0 "J3" H 6650 2900 50  0000 C CNN
+F 1 "Heater" H 6850 2750 50  0000 C CNN
+F 2 "Wire_Pads:SolderWirePad_2x_1-2mmDrill" H 6650 2800 50  0001 C CNN
+F 3 "" H 6650 2800 50  0001 C CNN
+	1    6650 2800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6450 2900 6450 3100
+$Comp
+L Conn_01x02 J1
+U 1 1 59B2985B
+P 4350 2650
+F 0 "J1" H 4350 2750 50  0000 C CNN
+F 1 "12V" H 4500 2600 50  0000 C CNN
+F 2 "Wire_Pads:SolderWirePad_2x_1-2mmDrill" H 4350 2650 50  0001 C CNN
+F 3 "" H 4350 2650 50  0001 C CNN
+	1    4350 2650
+	-1   0    0    1   
+$EndComp
+$Comp
+L GND #PWR1
+U 1 1 59B298EE
+P 4550 2650
+F 0 "#PWR1" H 4550 2400 50  0001 C CNN
+F 1 "GND" H 4550 2500 50  0000 C CNN
+F 2 "" H 4550 2650 50  0001 C CNN
+F 3 "" H 4550 2650 50  0001 C CNN
+	1    4550 2650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4550 2550 5650 2550
+Wire Wire Line
+	5650 2550 6300 2550
+Wire Wire Line
+	6300 2550 6300 2800
+Wire Wire Line
+	6300 2800 6450 2800
+$Comp
+L Q_NMOS_GSD Q1
+U 1 1 59B2A260
+P 5550 3400
+F 0 "Q1" H 5750 3450 50  0000 L CNN
+F 1 "SI2308" H 5750 3350 50  0000 L CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23" H 5750 3500 50  0001 C CNN
+F 3 "" H 5550 3400 50  0001 C CNN
+	1    5550 3400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5650 3200 6050 3200
+Wire Wire Line
+	6050 3200 6050 3300
+Connection ~ 5650 3200
+Wire Wire Line
+	5650 2900 5650 2550
+Connection ~ 5650 2550
+$Comp
+L Conn_01x02 J4
+U 1 1 59B2A3BB
+P 6650 4150
+F 0 "J4" H 6650 4250 50  0000 C CNN
+F 1 "Temp sensor" H 6950 4100 50  0000 C CNN
+F 2 "Wire_Pads:SolderWirePad_2x_1-2mmDrill" H 6650 4150 50  0001 C CNN
+F 3 "" H 6650 4150 50  0001 C CNN
+	1    6650 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR8
+U 1 1 59B2A562
+P 6450 4250
+F 0 "#PWR8" H 6450 4000 50  0001 C CNN
+F 1 "GND" H 6450 4100 50  0000 C CNN
+F 2 "" H 6450 4250 50  0001 C CNN
+F 3 "" H 6450 4250 50  0001 C CNN
+	1    6450 4250
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R4
+U 1 1 59B2A57F
+P 6100 4150
+F 0 "R4" V 6180 4150 50  0000 C CNN
+F 1 "4.7K" V 6100 4150 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603" V 6030 4150 50  0001 C CNN
+F 3 "" H 6100 4150 50  0001 C CNN
+	1    6100 4150
+	0    1    1    0   
+$EndComp
+$Comp
+L +3V3 #PWR6
+U 1 1 59B2A615
+P 5950 4000
+F 0 "#PWR6" H 5950 3850 50  0001 C CNN
+F 1 "+3V3" H 5950 4140 50  0000 C CNN
+F 2 "" H 5950 4000 50  0001 C CNN
+F 3 "" H 5950 4000 50  0001 C CNN
+	1    5950 4000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5950 4000 5950 4150
+Wire Wire Line
+	6250 4150 6300 4150
+Wire Wire Line
+	6300 4150 6450 4150
+$Comp
+L Conn_01x04 J2
+U 1 1 59B2A8AA
+P 4350 3750
+F 0 "J2" H 4350 3950 50  0000 C CNN
+F 1 "Arduino" H 4350 3450 50  0000 C CNN
+F 2 "KiCad_custom:conn_4pin_TH_1.8mm" H 4350 3750 50  0001 C CNN
+F 3 "" H 4350 3750 50  0001 C CNN
+	1    4350 3750
+	-1   0    0    1   
+$EndComp
+$Comp
+L GND #PWR3
+U 1 1 59B2A910
+P 4550 3850
+F 0 "#PWR3" H 4550 3600 50  0001 C CNN
+F 1 "GND" H 4550 3700 50  0000 C CNN
+F 2 "" H 4550 3850 50  0001 C CNN
+F 3 "" H 4550 3850 50  0001 C CNN
+	1    4550 3850
+	1    0    0    -1  
+$EndComp
+$Comp
+L +3V3 #PWR2
+U 1 1 59B2A97B
+P 4550 3100
+F 0 "#PWR2" H 4550 2950 50  0001 C CNN
+F 1 "+3V3" H 4550 3240 50  0000 C CNN
+F 2 "" H 4550 3100 50  0001 C CNN
+F 3 "" H 4550 3100 50  0001 C CNN
+	1    4550 3100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4550 3100 4550 3550
+Wire Wire Line
+	4550 3650 4800 3650
+Wire Wire Line
+	4800 3650 5050 3650
+Wire Wire Line
+	5050 3650 5050 3400
+Wire Wire Line
+	5050 3400 5350 3400
+Wire Wire Line
+	4550 3750 6300 3750
+Wire Wire Line
+	6300 3750 6300 4150
+Connection ~ 6300 4150
+$Comp
+L R R2
+U 1 1 59B2AAEA
+P 5050 3250
+F 0 "R2" V 5130 3250 50  0000 C CNN
+F 1 "4.7K" V 5050 3250 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603" V 4980 3250 50  0001 C CNN
+F 3 "" H 5050 3250 50  0001 C CNN
+	1    5050 3250
+	-1   0    0    1   
+$EndComp
+Connection ~ 5050 3400
+$Comp
+L +3V3 #PWR5
+U 1 1 59B2AB41
+P 5050 3100
+F 0 "#PWR5" H 5050 2950 50  0001 C CNN
+F 1 "+3V3" H 5050 3240 50  0000 C CNN
+F 2 "" H 5050 3100 50  0001 C CNN
+F 3 "" H 5050 3100 50  0001 C CNN
+	1    5050 3100
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D1
+U 1 1 59B2AD55
+P 4800 3400
+F 0 "D1" H 4800 3500 50  0000 C CNN
+F 1 "LED" H 4800 3300 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 3400 50  0001 C CNN
+F 3 "" H 4800 3400 50  0001 C CNN
+	1    4800 3400
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	4800 3550 4800 3650
+Connection ~ 4800 3650
+$Comp
+L +3V3 #PWR4
+U 1 1 59B2AE43
+P 4800 2850
+F 0 "#PWR4" H 4800 2700 50  0001 C CNN
+F 1 "+3V3" H 4800 2990 50  0000 C CNN
+F 2 "" H 4800 2850 50  0001 C CNN
+F 3 "" H 4800 2850 50  0001 C CNN
+	1    4800 2850
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R1
+U 1 1 59B2B162
+P 4800 3050
+F 0 "R1" V 4880 3050 50  0000 C CNN
+F 1 "300" V 4800 3050 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603" V 4730 3050 50  0001 C CNN
+F 3 "" H 4800 3050 50  0001 C CNN
+	1    4800 3050
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4800 3200 4800 3250
+Wire Wire Line
+	4800 2900 4800 2850
+$EndSCHEMATC
