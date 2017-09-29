@@ -4,6 +4,28 @@
 
 #define tt_len 			50	// items in tt table
 
+/*
+// current situation looks like this:
+calculated, acutal
+37,41
+35,39
+60,64
+62,65
+80,86
+82,88
+105,115
+110,120
+115,126
+120,134
+132,150
+140,161
+150,170
+160,179
+180,200
+200,216
+205,220
+*/
+
 const short TEMPTABLE[][2] PROGMEM = {
   {    1 * OVERSAMPLENR, 769 },   // 938
   {   31 * OVERSAMPLENR, 257 },   // 314

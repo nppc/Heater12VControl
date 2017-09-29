@@ -2,8 +2,8 @@
 
 #define OVERSAMPLENR 	16
 
-#define MOSFET_PIN 		13
-#define TEMPSENSOR_PIN 	A1
+#define MOSFET_PIN 		A1
+#define TEMPSENSOR_PIN 	A0
 #define KNOB_PIN 		A2	// Potentsiomenter for setting the desired temperature
 
 #include <U8g2lib.h>
@@ -60,7 +60,7 @@ void loop() {
 		u8g2.clearBuffer();
 		u8g2.setFont(u8g2_font_inb16_mr);
 		u8g2.setCursor(0, 15);
-		if (presetTemp < (last_presetTemp-1) || presetTemp > (last_presetTemp+1)) { // add small hysterysis
+		if (presetTemp < (last_presetTemp-2) || presetTemp > (last_presetTemp+2)) { // add small hysterysis
 			// value is adjusted
 			last_presetTemp = presetTemp;
 			adjust_hyst_ms = millis();
