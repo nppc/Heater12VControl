@@ -4,77 +4,55 @@
 
 #define tt_len 			50	// items in tt table
 
-/*
-// current situation looks like this:
-calculated, acutal
-37,41
-35,39
-60,64
-62,65
-80,86
-82,88
-105,115
-110,120
-115,126
-120,134
-132,150
-140,161
-150,170
-160,179
-180,200
-200,216
-205,220
-*/
-
 const short TEMPTABLE[][2] PROGMEM = {
-  {    1 * OVERSAMPLENR, 769 },   // 938
-  {   31 * OVERSAMPLENR, 257 },   // 314
-  {   41 * OVERSAMPLENR, 238 },   // 290
-  {   51 * OVERSAMPLENR, 223 },   // 272
-  {   61 * OVERSAMPLENR, 212 },   // 258
-  {   71 * OVERSAMPLENR, 203 },   // 247
-  {   81 * OVERSAMPLENR, 194 },   // 237
-  {   91 * OVERSAMPLENR, 188 },   // 229
-  {  101 * OVERSAMPLENR, 181 },   // 221
-  {  111 * OVERSAMPLENR, 176 },   // 215
-  {  121 * OVERSAMPLENR, 171 },   // 209
-  {  131 * OVERSAMPLENR, 167 },   // 204
-  {  141 * OVERSAMPLENR, 163 },   // 199
-  {  151 * OVERSAMPLENR, 160 },   // 195
-  {  161 * OVERSAMPLENR, 156 },   // 190
-  {  171 * OVERSAMPLENR, 153 },   // 187
-  {  181 * OVERSAMPLENR, 150 },   // 183
-  {  191 * OVERSAMPLENR, 147 },   // 179
-  {  201 * OVERSAMPLENR, 143 },   // 176
-  {  221 * OVERSAMPLENR, 139 },   // 170
-  {  241 * OVERSAMPLENR, 135 },   // 165
-  {  261 * OVERSAMPLENR, 132 },   // 160
-  {  281 * OVERSAMPLENR, 128 },   // 155
-  {  301 * OVERSAMPLENR, 125 },   // 150
-  {  331 * OVERSAMPLENR, 122 },   // 144
-  {  361 * OVERSAMPLENR, 119 },   // 139
-  {  391 * OVERSAMPLENR, 115 },   // 133
-  {  421 * OVERSAMPLENR, 111 },   // 128
-  {  451 * OVERSAMPLENR, 107 },   // 123
-  {  491 * OVERSAMPLENR, 103 },   // 117
-  {  531 * OVERSAMPLENR,  99 },   // 111
-  {  571 * OVERSAMPLENR,  94 },   // 105
-  {  611 * OVERSAMPLENR,  89 },   // 100
-  {  641 * OVERSAMPLENR,  85 },   //  95
-  {  681 * OVERSAMPLENR,  80 },   //  90
-  {  711 * OVERSAMPLENR,  76 },   //  85
-  {  751 * OVERSAMPLENR,  70 },   //  79
-  {  791 * OVERSAMPLENR,  65 },   //  72
-  {  811 * OVERSAMPLENR,  61 },   //  69
-  {  831 * OVERSAMPLENR,  57 },   //  65
-  {  871 * OVERSAMPLENR,  52 },   //  57
-  {  881 * OVERSAMPLENR,  49 },   //  55
-  {  901 * OVERSAMPLENR,  45 },   //  51
-  {  921 * OVERSAMPLENR,  40 },   //  45
-  {  941 * OVERSAMPLENR,  33 },   //  39
-  {  971 * OVERSAMPLENR,  27 },   //  28
-  {  981 * OVERSAMPLENR,  21 },   //  23
-  {  991 * OVERSAMPLENR,  15 },   //  17
-  { 1001 * OVERSAMPLENR,   8 },   //   9
+  {    1 * OVERSAMPLENR, 700 },   // 938
+  {   31 * OVERSAMPLENR, 261 },   // 314
+  {   41 * OVERSAMPLENR, 256 },   // 290
+  {   51 * OVERSAMPLENR, 241 },   // 272
+  {   61 * OVERSAMPLENR, 230 },   // 258
+  {   71 * OVERSAMPLENR, 221 },   // 247
+  {   81 * OVERSAMPLENR, 212 },   // 237
+  {   91 * OVERSAMPLENR, 206 },   // 229
+  {  101 * OVERSAMPLENR, 199 },   // 221
+  {  111 * OVERSAMPLENR, 194 },   // 215
+  {  121 * OVERSAMPLENR, 189 },   // 209
+  {  131 * OVERSAMPLENR, 185 },   // 204
+  {  141 * OVERSAMPLENR, 181 },   // 199
+  {  151 * OVERSAMPLENR, 178 },   // 195
+  {  161 * OVERSAMPLENR, 174 },   // 190
+  {  171 * OVERSAMPLENR, 170 },   // 187
+  {  181 * OVERSAMPLENR, 167 },   // 183
+  {  191 * OVERSAMPLENR, 164 },   // 179
+  {  201 * OVERSAMPLENR, 160 },   // 176
+  {  221 * OVERSAMPLENR, 156 },   // 170
+  {  241 * OVERSAMPLENR, 151 },   // 165
+  {  261 * OVERSAMPLENR, 148 },   // 160
+  {  281 * OVERSAMPLENR, 144 },   // 155
+  {  301 * OVERSAMPLENR, 141 },   // 150
+  {  331 * OVERSAMPLENR, 138 },   // 144
+  {  361 * OVERSAMPLENR, 134 },   // 139
+  {  391 * OVERSAMPLENR, 130 },   // 133
+  {  421 * OVERSAMPLENR, 126 },   // 128
+  {  451 * OVERSAMPLENR, 122 },   // 123
+  {  491 * OVERSAMPLENR, 117 },   // 117
+  {  531 * OVERSAMPLENR, 113 },   // 111
+  {  571 * OVERSAMPLENR, 107 },   // 105
+  {  611 * OVERSAMPLENR, 102 },   // 100
+  {  641 * OVERSAMPLENR,  97 },   //  95
+  {  681 * OVERSAMPLENR,  92 },   //  90
+  {  711 * OVERSAMPLENR,  87 },   //  85
+  {  751 * OVERSAMPLENR,  81 },   //  79
+  {  791 * OVERSAMPLENR,  75 },   //  72
+  {  811 * OVERSAMPLENR,  70 },   //  69
+  {  831 * OVERSAMPLENR,  66 },   //  65
+  {  871 * OVERSAMPLENR,  60 },   //  57
+  {  881 * OVERSAMPLENR,  57 },   //  55
+  {  901 * OVERSAMPLENR,  52 },   //  51
+  {  921 * OVERSAMPLENR,  47 },   //  45
+  {  941 * OVERSAMPLENR,  39 },   //  39
+  {  971 * OVERSAMPLENR,  32 },   //  28
+  {  981 * OVERSAMPLENR,  25 },   //  23
+  {  991 * OVERSAMPLENR,  18 },   //  17
+  { 1001 * OVERSAMPLENR,  12 },   //   9
   { 1021 * OVERSAMPLENR, -24 }    // -27
 };
