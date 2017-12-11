@@ -3,6 +3,7 @@
 void initEncoder() {    
 	pinMode(encoderPinA, INPUT_PULLUP); 
     pinMode(encoderPinB, INPUT_PULLUP); 
+    pinMode(BUTTON_PIN, INPUT_PULLUP); 
     attachInterrupt(1, INT_doEncoder, FALLING);  // encoder pin on interrupt 1 - pin 3
 }
 
@@ -11,7 +12,7 @@ char rotaryEncRead() {
   char tmp = encoderPos;
   encoderPos=0;  // reset encoder
   interrupts();
-  //if(!digitalRead((rotaryNr==LEFT_ENCODER) ? BUTTON0_PIN : BUTTON1_PIN)){tmp=127;} // read button
+  if(!digitalRead(BUTTON_PIN)){tmp=127;} // read button
   return tmp;
 }
 
