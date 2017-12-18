@@ -1,7 +1,7 @@
 //*********************
 // * HW CONFIGURATION *
 //*********************
-#define DEBUG	// output the results to Serial
+//#define DEBUG	// output the results to Serial
 #define OLED	// Use OLED display
 //*********************
 
@@ -9,8 +9,10 @@
 #include "temperature.h"
 #include "encoder.h"
 #include "adc.h"
-#include <AutoPID.h>
+//#include <AutoPID.h>
+#include <PID_v1.h>
 #include <EEPROM.h>
+#include "eeprom.h"
 
 #ifdef OLED
 	#include <U8g2lib.h>
@@ -28,17 +30,6 @@
 #define BUTTON_PIN   12 // Pin for knob button
 
 
-// *** EEPROM variables ***
-#define EEPROM_PID_P				 2 // int P value for PID control
-#define EEPROM_PID_I				 4 // int I value for PID control
-#define EEPROM_PID_D				 6 // int D value for PID control
-#define EEPROM_CONTROLTYPE     		10 // byte Store temperature controlling method (AUTO or MANUAL)
-#define EEPROM_MANUAL_TEMP 			12 // int Preset temperature for manual control.
-#define EEPROM_AUTO_PREHEAT_TEMP	14 // int Preheat temperature in Auto mode
-#define EEPROM_AUTO_REFLOW_TEMP		16 // int Reflow temperature in Auto mode
-#define EEPROM_AUTO_PREHEAT_TIME	18 // byte Seconds for Preheat stage in Auto mode
-#define EEPROM_AUTO_REFLOW_TIME		20 // byte Seconds for Reflow stage in Auto mode
-
 
 // RAMP can always be 3 deg per second
 
@@ -52,11 +43,30 @@
 #define H_OFF 	digitalWrite(MOSFET_PIN,HIGH)
 
 uint8_t ControlType;		// 1 - Manual or 2 - Auto
+uint8_t ProcessStage;		// 0 - just hold manual temperature; 1 - Ramp to Preheat; 2 - Preheat; 3 - Ramp to Reflow; 4 - Reflow; 5 - Cool down; 255 - finished
+
+// PID global variables
+int WindowSize = 500;
+#define PID_VALUES_FACTOR 100.0	//PID values are stored in EEPROM in int format. So, scale them (div/mult) before use.
+unsigned long soft_pwm_millis=0;
+//bool soft_pwm_pin_state=LOW;
+
+double currentTemp=0;
+double setPoint=0;
+double outputVal;
+
+uint16_t pid_P, pid_I, pid_D; // PID values
+uint16_t auto_preheatTemp, auto_preheatTime, auto_reflowTemp, auto_reflowTime;
+
+
+
+//input/output variables passed by reference, so they are updated automatically
+PID myPID(&currentTemp, &outputVal, &setPoint, 0, 0, 0, DIRECT); // PID values will be set later
+
+
 
 bool stateHeater;
 bool stateAdjustment=HIGH;	// Is temperature adjusted?
-int presetTemp;
-float currentTemp;
 int last_presetTemp = 0;
 unsigned long adjust_hyst_ms = 0;
 unsigned long switch_mosfet_hyst_ms = 0;
@@ -88,10 +98,16 @@ void setup(){
 		Serial.println(analog2temp(collectADCraw(TEMPSENSOR_PIN)));
 	#endif
 	
+		// read PID values from EEPROM
+	restore_settingsEEPROM();
+	myPID.SetTunings((float)pid_P / PID_VALUES_FACTOR,(float)pid_I / PID_VALUES_FACTOR,(float)pid_D / PID_VALUES_FACTOR);
+	myPID.SetOutputLimits(0, WindowSize);	//set PID update interval to 4000ms
+
 	initEncoder();
-	
+		
 	// main screen (choose Manual.Auto)
 	ControlType = constrain(EEPROM.read(EEPROM_CONTROLTYPE), 1, 2);
+	drawMenu_AutoManual(ControlType);
 	char encVal = 0;  // signed value - nothing is pressed
 	while (rotaryEncRead() != 127) {
 		encVal = rotaryEncRead();
@@ -102,46 +118,30 @@ void setup(){
 	}
 	EEPROM.update(EEPROM_CONTROLTYPE,ControlType);	// store selected COntrol Type for the next time
 	
+
+	if(ControlType==1){
+		ProcessStage=0; // hold temperature
+		//presetTemp = readEEPROMint(EEPROM_MANUAL_TEMP);
+	}else{
+		ProcessStage=1; // ramp to preheat temperature
+		//presetTemp = readEEPROMint(EEPROM_AUTO_PREHEAT_TEMP);
+	}
+	
+	myPID.SetMode(AUTOMATIC); // turn on PID
+		
 }
 
 void loop() {
-	// do the controlling of the temperature of the heater.
-	// we will hold the temperature 
 	
-	//presetTemp = map(collectADCraw(KNOB_PIN),0,1023*OVERSAMPLENR,20,300);
-	currentTemp = analog2temp(collectADCraw(TEMPSENSOR_PIN));
-
-	// Switch Heater ON/OFF
-	if (switch_mosfet_hyst_ms+500 < millis()) {
-		// if preset temperature is near 20, consider allways OFF
-		if ((float)presetTemp>=currentTemp && presetTemp>21) {
-			if(!stateHeater){
-				H_ON;
-				stateHeater=HIGH;
-				#ifdef OLED
-					screenRedraw();
-				#endif
-			}
-		} else {
-			if(stateHeater){
-				H_OFF;
-				stateHeater=LOW;
-				#ifdef OLED
-					screenRedraw();
-				#endif
-			}
-		}
-		switch_mosfet_hyst_ms = millis();
-	}	
-
-	// Adjust temperature
-	if (abs(presetTemp-last_presetTemp)>2) {
-		stateAdjustment=HIGH;
-		adjust_hyst_ms = millis();
-		last_presetTemp = presetTemp;
-	} else {
-		if(adjust_hyst_ms+2000 < millis()){stateAdjustment=LOW;}
+	if(ControlType==1){
+		doManualReflow();
+	}else{
+		doAutoReflow();
 	}
+
+	currentTemp = analog2temp(collectADCraw(TEMPSENSOR_PIN));
+	myPID.Compute();
+	doSoftwarePWM((uint16_t)outputVal);	// make slow PWM to prevent unnecessary mosfet heating 
 	
 	#ifdef OLED
 		// Display
@@ -173,4 +173,21 @@ void loop() {
 		#endif
 	}
 
+}
+
+
+// PWM output 
+void doSoftwarePWM(uint16_t pwm_val){
+	if (millis() - soft_pwm_millis > WindowSize)
+	  { //time to shift the Relay Window
+		soft_pwm_millis += WindowSize;
+	  }
+	if (pwm_val < millis() - soft_pwm_millis){H_ON;}else{H_OFF;}
+		
+}
+
+void doManualReflow(){
+}
+
+void doAutoReflow(){
 }
