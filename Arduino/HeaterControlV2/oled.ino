@@ -34,21 +34,6 @@
 	};
 
 
-	void screenRedraw() {
-		u8g2.clearBuffer();
-		if(stateHeater){u8g2.drawXBMP( 86, 1, 8, 14, u8g_logo_bits);}
-		u8g2.setCursor(0, 16);
-		if (stateAdjustment) {
-			// value is adjusted
-			u8g2.print("<");
-			u8g2.print(presetTemp);
-			u8g2.print(">");
-		} else {
-			u8g2.print(currentTemp,1);
-		}
-		u8g2.sendBuffer();
-	}
-
 	// Draw initial menu with selected item (1 - Auto, 2 - Manual)
 	void drawMenu_AutoManual(uint8_t sel) {
 		if(sel==1){

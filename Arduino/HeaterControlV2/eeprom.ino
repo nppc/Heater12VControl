@@ -1,4 +1,4 @@
-restore_settingsEEPROM(){
+void restore_settingsEEPROM(){
 	pid_P = constrain(readEEPROMint(EEPROM_PID_P),1,999);
 	pid_I = constrain(readEEPROMint(EEPROM_PID_I),1,999);
 	pid_D = constrain(readEEPROMint(EEPROM_PID_D),1,999);
@@ -8,7 +8,7 @@ restore_settingsEEPROM(){
 	auto_reflowTime = constrain(readEEPROMint(EEPROM_AUTO_REFLOW_TIME),1,999);
 }
 
-store_settingsEEPROM(){
+void store_settingsEEPROM(){
 	writeEEPROMint(EEPROM_PID_P,pid_P);
 	writeEEPROMint(EEPROM_PID_I,pid_I);
 	writeEEPROMint(EEPROM_PID_D,pid_D);

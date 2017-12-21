@@ -29,3 +29,19 @@ void INT_doEncoder() {
     encodermillis = millis();
 }
 
+// determine if rotary encoder was pressed longer than 3 seconds
+bool is_rotaryEncLongPress() {
+	 if(digitalRead(BUTTON_PIN)){
+		 // button is not pressed
+		 encoderLongPressmillis=millis();
+	 }else{
+		 // button is pressed
+		 // how long?
+		 if((encoderLongPressmillis+3000)<millis()){
+			 // Long press engaged
+			 return true;
+			 encoderLongPressmillis=millis();	// reset counter
+		 }
+	 }
+	 return false;
+}

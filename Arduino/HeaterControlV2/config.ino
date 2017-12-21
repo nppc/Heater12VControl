@@ -66,7 +66,7 @@ void printConfParam(uint8_t item, uint16_t value, boolean edit){
 	u8g2.clearBuffer();
 	u8g2.setDrawColor(2);	//inverse mode
 	if(edit && value != 8){
-		drawBox(90,6,128-90,32-6*2);
+		u8g2.drawBox(90,6,128-90,32-6*2);
 	}
 	u8g2.setCursor(0, 12);
 	switch (item) {

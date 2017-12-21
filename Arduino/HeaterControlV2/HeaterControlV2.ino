@@ -9,7 +9,6 @@
 #include "temperature.h"
 #include "encoder.h"
 #include "adc.h"
-//#include <AutoPID.h>
 #include <PID_v1.h>
 #include <EEPROM.h>
 #include "eeprom.h"
@@ -23,7 +22,6 @@
 
 #define MOSFET_PIN 		A1
 #define TEMPSENSOR_PIN 	A0
-//#define KNOB_PIN 		A2	// Potentiometer for setting the desired temperature
 
 #define encoderPinA   3	// Interrupt pin (coupled with capacitor to GND)
 #define encoderPinB   4 // Interrupt pin (coupled with capacitor to GND)
@@ -116,8 +114,14 @@ void setup(){
 			drawMenu_AutoManual(ControlType);
 		}
 	}
-	EEPROM.update(EEPROM_CONTROLTYPE,ControlType);	// store selected COntrol Type for the next time
-	
+	EEPROM.update(EEPROM_CONTROLTYPE,ControlType);	// store selected Control Type for the next time
+	// wait until button released
+	while(rotaryEncRead() == 127){
+		if(is_rotaryEncLongPress()){
+			// go to config menu
+			configureParams();
+		}
+	}	
 
 	if(ControlType==1){
 		ProcessStage=0; // hold temperature
@@ -142,14 +146,6 @@ void loop() {
 	currentTemp = analog2temp(collectADCraw(TEMPSENSOR_PIN));
 	myPID.Compute();
 	doSoftwarePWM((uint16_t)outputVal);	// make slow PWM to prevent unnecessary mosfet heating 
-	
-	#ifdef OLED
-		// Display
-		if (disp_hyst_ms+700 < millis()) {
-			disp_hyst_ms=millis();
-			screenRedraw();
-		}	
-	#endif
 	
 	// debug 
 	#ifdef DEBUG
