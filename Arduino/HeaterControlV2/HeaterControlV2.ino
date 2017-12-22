@@ -12,6 +12,7 @@
 #include <PID_v1.h>
 #include <EEPROM.h>
 #include "eeprom.h"
+#include <avr/wdt.h>
 
 #ifdef OLED
 	#include <U8g2lib.h>
@@ -46,8 +47,6 @@ uint8_t ProcessStage;		// 0 - just hold manual temperature; 1 - Ramp to Preheat;
 // PID global variables
 int WindowSize = 500;
 #define PID_VALUES_FACTOR 100.0	//PID values are stored in EEPROM in int format. So, scale them (div/mult) before use.
-unsigned long soft_pwm_millis=0;
-//bool soft_pwm_pin_state=LOW;
 
 double currentTemp=0;
 double setPoint=0;
@@ -56,18 +55,15 @@ double outputVal;
 uint16_t pid_P, pid_I, pid_D; // PID values
 uint16_t auto_preheatTemp, auto_preheatTime, auto_reflowTemp, auto_reflowTime;
 
-
+unsigned long soft_pwm_millis=0;
 
 //input/output variables passed by reference, so they are updated automatically
 PID myPID(&currentTemp, &outputVal, &setPoint, 0, 0, 0, DIRECT); // PID values will be set later
 
+unsigned long timer_millis;
+uint16_t timer_seconds;
+boolean timer_active=false;
 
-
-bool stateHeater;
-bool stateAdjustment=HIGH;	// Is temperature adjusted?
-int last_presetTemp = 0;
-unsigned long adjust_hyst_ms = 0;
-unsigned long switch_mosfet_hyst_ms = 0;
 
 #ifdef DEBUG
 	unsigned long serial_mosfet_hyst_ms = 0;
@@ -75,17 +71,18 @@ unsigned long switch_mosfet_hyst_ms = 0;
 
 void setup(){
 	
+	wdt_disable();
 	H_OFF;
 	pinMode(MOSFET_PIN,OUTPUT);
 
 	#ifdef DEBUG
-		Serial.begin(57600);
+		Serial.begin(115200);
 	#endif
 	
 	#ifdef OLED
 		u8g2.begin();
-		u8g2.clearBuffer();
-		u8g2.setFont(u8g2_font_inb16_mr);
+		//u8g2.clearBuffer();
+		//u8g2.setFont(u8g2_font_inb16_mr);
 		//u8g2_font_t0_22_tn - numeric font for current temperature
 		//u8g2_font_profont12_tn - numeric font for preset temperature and timer
 		
@@ -103,11 +100,13 @@ void setup(){
 
 	initEncoder();
 		
+	// wait until button is depressed (in case it was)
+	while(rotaryEncRead() == 127){}
 	// main screen (choose Manual.Auto)
 	ControlType = constrain(EEPROM.read(EEPROM_CONTROLTYPE), 1, 2);
 	drawMenu_AutoManual(ControlType);
 	char encVal = 0;  // signed value - nothing is pressed
-	while (rotaryEncRead() != 127) {
+	while (encVal != 127) {
 		encVal = rotaryEncRead();
 		if(encVal!=127 && encVal!=0) {
 			if(encVal>0){ControlType=1;}else{ControlType=2;}
@@ -115,6 +114,7 @@ void setup(){
 		}
 	}
 	EEPROM.update(EEPROM_CONTROLTYPE,ControlType);	// store selected Control Type for the next time
+	u8g2.clearDisplay();
 	// wait until button released
 	while(rotaryEncRead() == 127){
 		if(is_rotaryEncLongPress()){
@@ -125,6 +125,7 @@ void setup(){
 
 	if(ControlType==1){
 		ProcessStage=0; // hold temperature
+		setPoint=20;	// Allways start from 20 deg.
 		//presetTemp = readEEPROMint(EEPROM_MANUAL_TEMP);
 	}else{
 		ProcessStage=1; // ramp to preheat temperature
@@ -132,10 +133,14 @@ void setup(){
 	}
 	
 	myPID.SetMode(AUTOMATIC); // turn on PID
+	
+	timer_seconds=0;
 		
 }
 
 void loop() {
+	
+	WDT_Init();	// keep system alive
 	
 	if(ControlType==1){
 		doManualReflow();
@@ -151,23 +156,30 @@ void loop() {
 	#ifdef DEBUG
 	if (serial_mosfet_hyst_ms+500 < millis()) {
 		serial_mosfet_hyst_ms=millis();
-		/*
 		serial_mosfet_hyst_ms = millis();
 		Serial.print("Set: ");
-		Serial.print(presetTemp);
+		Serial.print(setPoint);
 		Serial.print(", Actual: ");
 		Serial.println(currentTemp);
-		*/
 	}	
 	#endif
 
+	#ifdef DEBUG
 	if (has_encoderChange) {
-		encoderVal+=rotaryEncRead();
+		int encoderVal+=rotaryEncRead();
 		has_encoderChange=LOW;
-		#ifdef DEBUG
 			Serial.println(encoderVal);
-		#endif
 	}
+	#endif
+	
+	// increment timer
+	if(timer_millis+1000<millis()) {
+		uint16_t seconds_passed=(millis()-timer_millis)/1000;
+		timer_millis=millis();
+		if(timer_active){timer_seconds+=seconds_passed;}
+	}
+	
+	printHeaterState(); //print icon of the heater ON/OFF state
 
 }
 
@@ -183,7 +195,31 @@ void doSoftwarePWM(uint16_t pwm_val){
 }
 
 void doManualReflow(){
+	// Exit from manual state by holding button for 2 seconds...
+	// Adjust preset temperature by rotating the knob
+	char encVal = 127;  // signed value - just enter to the loop
+	while (encVal == 127) { //loop here while button is pressed (waiting longer than 2 seconds will reset the board (Exit to the init menu).
+		encVal = rotaryEncRead();
+		if(encVal!=127 && encVal!=0) {
+			setPoint = constrain(setPoint+encVal,20,300);
+		}
+	}
+	// draw screen
+	u8g2.clearBuffer();
+	printManual();
+	printPresetTemperature();
+	printTime(timer_seconds);
+	printCurrentTemperature();
+	
+	u8g2.sendBuffer();
 }
 
 void doAutoReflow(){
+	u8g2.clearBuffer();
+
+	printPresetTemperature();
+	printTime(timer_seconds);
+	printCurrentTemperature();
+
+	u8g2.sendBuffer();
 }
