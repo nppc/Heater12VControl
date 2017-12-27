@@ -1,4 +1,8 @@
 void configureParams(){
+	#ifdef DEBUG
+	Serial.println("Configure Mode");
+	#endif
+
 	uint8_t item = 1;
 	uint16_t value;
 	boolean edit = false;

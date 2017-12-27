@@ -1,7 +1,7 @@
 //*********************
 // * HW CONFIGURATION *
 //*********************
-//#define DEBUG	// output the results to Serial
+#define DEBUG	// output the results to Serial
 #define OLED	// Use OLED display
 //*********************
 
@@ -90,7 +90,7 @@ void setup(){
 	
 	#ifdef DEBUG
 		Serial.print("Temperature Sensor: ");
-		Serial.println(analog2temp(collectADCraw(TEMPSENSOR_PIN)));
+		Serial.println(analog2temp(digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray)));
 	#endif
 	
 		// read PID values from EEPROM
@@ -111,11 +111,16 @@ void setup(){
 		if(encVal!=127 && encVal!=0) {
 			if(encVal>0){ControlType=1;}else{ControlType=2;}
 			drawMenu_AutoManual(ControlType);
+			#ifdef DEBUG
+			Serial.print("ControlType is: ");
+			Serial.println(ControlType);
+			#endif
 		}
 	}
 	EEPROM.update(EEPROM_CONTROLTYPE,ControlType);	// store selected Control Type for the next time
 	u8g2.clearDisplay();
 	// wait until button released
+	encoderLongPressmillis=millis();
 	while(rotaryEncRead() == 127){
 		if(is_rotaryEncLongPress()){
 			// go to config menu
@@ -127,9 +132,15 @@ void setup(){
 		ProcessStage=0; // hold temperature
 		setPoint=20;	// Allways start from 20 deg.
 		//presetTemp = readEEPROMint(EEPROM_MANUAL_TEMP);
+		#ifdef DEBUG
+		Serial.println("Start Manual mode");
+		#endif
 	}else{
 		ProcessStage=1; // ramp to preheat temperature
 		//presetTemp = readEEPROMint(EEPROM_AUTO_PREHEAT_TEMP);
+		#ifdef DEBUG
+		Serial.println("Start Automatic mode");
+		#endif
 	}
 	
 	myPID.SetMode(AUTOMATIC); // turn on PID
@@ -163,15 +174,7 @@ void loop() {
 		Serial.print(", Actual: ");
 		Serial.println(currentTemp);
 	}	
-	#endif
-
-	#ifdef DEBUG
-	if (has_encoderChange) {
-		int encoderVal+=rotaryEncRead();
-		has_encoderChange=LOW;
-			Serial.println(encoderVal);
-	}
-	#endif
+	#endif	
 	
 	// increment timer
 	if(timer_millis+1000<millis()) {
