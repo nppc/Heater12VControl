@@ -12,11 +12,11 @@ int collectADCraw(uint8_t sensor) {
 
 
 // smooth algorytm for ADC reading
-unsigned int digitalSmooth(unsigned int rawIn, unsigned int *sensSmoothArray){     // "int *sensSmoothArray" passes an array to the function - the asterisk indicates the array name is a pointer
-  unsigned int j, k, temp, top, bottom;
+uint16_t digitalSmooth(uint16_t rawIn, uint16_t *sensSmoothArray){     // "int *sensSmoothArray" passes an array to the function - the asterisk indicates the array name is a pointer
+  uint16_t j, k, temp, top, bottom;
   unsigned long total;
   static int i;
-  static unsigned int sorted[filterSamples];
+  static uint16_t sorted[filterSamples];
   boolean done;
 
   i = (i + 1) % filterSamples;    // increment counter and roll over if necc. -  % (modulo operator) rolls over variable

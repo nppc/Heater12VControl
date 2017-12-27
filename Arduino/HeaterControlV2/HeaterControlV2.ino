@@ -148,7 +148,8 @@ void loop() {
 		doAutoReflow();
 	}
 
-	currentTemp = analog2temp(collectADCraw(TEMPSENSOR_PIN));
+	uint16_t smoothADC = digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);
+	currentTemp = analog2temp(smoothADC);
 	myPID.Compute();
 	doSoftwarePWM((uint16_t)outputVal);	// make slow PWM to prevent unnecessary mosfet heating 
 	
@@ -212,6 +213,8 @@ void doManualReflow(){
 	printCurrentTemperature();
 	
 	u8g2.sendBuffer();
+	
+	if(currentTemp>=(setPoint-5)){timer_active=true;} else {timer_active=false;}	// Timer running if temperature near or reached preset temp.
 }
 
 void doAutoReflow(){

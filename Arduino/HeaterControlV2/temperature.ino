@@ -1,8 +1,8 @@
 #define PGM_RD_W(x)   (short)pgm_read_word(&x)
 
 
-float analog2temp(int raw) {
-	if (raw==1023) {
+float analog2temp(uint16_t raw) {
+	if (raw==(1023 * OVERSAMPLENR)) {
 		#ifdef DEBUG
 		Serial.println("No Sensor!");
 		#endif
