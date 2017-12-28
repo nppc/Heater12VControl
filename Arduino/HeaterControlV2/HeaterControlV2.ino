@@ -3,6 +3,7 @@
 //*********************
 #define DEBUG	// output the results to Serial
 //#define OLED	// Use OLED display
+#define LOGGER
 //*********************
 
 
@@ -181,11 +182,12 @@ void loop() {
 	
 	// debug 
 	#ifdef DEBUG
-	if (serial_mosfet_hyst_ms+500 < millis()) {
+	if (serial_mosfet_hyst_ms+1000 < millis()) {
 		serial_mosfet_hyst_ms=millis();
 		serial_mosfet_hyst_ms = millis();
 		Serial.print("Set: ");Serial.print(setPoint);
 		Serial.print(", Actual: ");Serial.print(currentTemp);
+		Serial.print(", PWM: ");Serial.print(outputVal);
 		Serial.print(", Timer: ");Serial.println(timer_seconds);
 	}	
 	#endif	
@@ -209,7 +211,13 @@ void doSoftwarePWM(uint16_t pwm_val){
 	  { //time to shift the Relay Window
 		soft_pwm_millis += WindowSize;
 	  }
-	if (pwm_val < millis() - soft_pwm_millis){H_ON;}else{H_OFF;}
+	if (pwm_val < millis() - soft_pwm_millis){
+		H_OFF;
+		digitalWrite(LED_PIN, LOW);
+	}else{
+		H_ON;
+		digitalWrite(LED_PIN, HIGH);
+	}
 		
 }
 
@@ -236,13 +244,16 @@ void doManualReflow(){
 		}
 	}
 	// draw screen
-	#ifdef OLED
+	#if defined (OLED) && !defined (LOGGER)
 	u8g2.clearBuffer();
 	printManual();
 	printPresetTemperature();
 	printTime(timer_seconds);
 	printCurrentTemperature();
 	u8g2.sendBuffer();
+	#endif
+	#ifdef LOGGER
+	logger128secOLED();
 	#endif
 	
 	if(currentTemp>=(setPoint-5)){timer_active=true;} else {timer_active=false;}	// Timer running if temperature near or reached preset temp.
