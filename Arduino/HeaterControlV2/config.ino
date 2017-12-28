@@ -1,13 +1,13 @@
 void configureParams(){
 	#ifdef DEBUG
-	Serial.println("Configure Mode");
+	Serial.println("Enter Config");
 	#endif
-
 	uint8_t item = 1;
 	uint16_t value;
 	boolean edit = false;
-	
 	printConfParam(item, value, edit);
+
+	waitUntilButtonReleased();
 	
 	// wait for encoder
 	char encVal = 0;  // signed value - nothing is pressed
@@ -49,24 +49,30 @@ void configureParams(){
 						break;
 				} 
 			}
-			if(encVal!=0){printConfParam(item, value, edit);}
-		}
-		if(encVal==127){ // button is pressed
-			if(value==7){
-				store_settingsEEPROM();
-				break;	// exit from procedure
-			}else{
-				// switch edit mode
-				edit=!edit;
+			if(encVal!=0){
+				printConfParam(item, value, edit);
 			}
 		}
+		if(encVal==127){ // button is pressed
+			if(item==8){
+				store_settingsEEPROM();
+				break;	// exit from procedure
+				// switch edit mode
+			}
+			edit=!edit;
+			waitUntilButtonReleased();
+		}
 	}
+	#ifdef DEBUG
+	Serial.println("Exit Config");
+	#endif
 
 }
 
 // item - number of configurable item
 // edit - if TRUE, then highlight the edited value
 void printConfParam(uint8_t item, uint16_t value, boolean edit){
+	#ifdef OLED
 	u8g2.clearBuffer();
 	u8g2.setDrawColor(2);	//inverse mode
 	if(edit && value != 8){
@@ -102,5 +108,12 @@ void printConfParam(uint8_t item, uint16_t value, boolean edit){
 	u8g2.setCursor(96, 12);
 	u8g2.print(value);
 	u8g2.sendBuffer();
+	#endif
+	#ifdef DEBUG
+	Serial.println("Change Config");
+	Serial.print("item: ");Serial.println(item);
+	Serial.print("value: ");Serial.println(value);
+	Serial.print("edit: ");Serial.println(edit);
+	#endif
 	
 }

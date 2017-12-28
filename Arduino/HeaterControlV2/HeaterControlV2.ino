@@ -2,7 +2,7 @@
 // * HW CONFIGURATION *
 //*********************
 #define DEBUG	// output the results to Serial
-#define OLED	// Use OLED display
+//#define OLED	// Use OLED display
 //*********************
 
 
@@ -22,6 +22,7 @@
 
 
 #define MOSFET_PIN 		A1
+#define LED_PIN 		13
 #define TEMPSENSOR_PIN 	A0
 
 #define encoderPinA   3	// Interrupt pin (coupled with capacitor to GND)
@@ -53,7 +54,7 @@ double setPoint=0;
 double outputVal;
 
 uint16_t pid_P, pid_I, pid_D; // PID values
-uint16_t auto_preheatTemp, auto_preheatTime, auto_reflowTemp, auto_reflowTime;
+uint16_t auto_preheatTemp, auto_preheatTime, auto_reflowTemp, auto_reflowTime, manual_temp;
 
 unsigned long soft_pwm_millis=0;
 
@@ -74,6 +75,8 @@ void setup(){
 	wdt_disable();
 	H_OFF;
 	pinMode(MOSFET_PIN,OUTPUT);
+	pinMode(LED_PIN,OUTPUT);
+	digitalWrite(LED_PIN, LOW);
 
 	#ifdef DEBUG
 		Serial.begin(115200);
@@ -88,6 +91,9 @@ void setup(){
 		
 	#endif
 	
+	//initialize ADC smoother array
+	for(uint8_t i=0;i<filterSamples*2;i++){digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);}
+	
 	#ifdef DEBUG
 		Serial.print("Temperature Sensor: ");
 		Serial.println(analog2temp(digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray)));
@@ -100,37 +106,46 @@ void setup(){
 
 	initEncoder();
 		
-	// wait until button is depressed (in case it was)
-	while(rotaryEncRead() == 127){}
+	waitUntilButtonReleased(); // in case it was
+
 	// main screen (choose Manual.Auto)
 	ControlType = constrain(EEPROM.read(EEPROM_CONTROLTYPE), 1, 2);
+	#ifdef OLED
 	drawMenu_AutoManual(ControlType);
+	#endif
+	#ifdef DEBUG
+	Serial.print("ControlType is: ");Serial.println(ControlType);
+	#endif
 	char encVal = 0;  // signed value - nothing is pressed
 	while (encVal != 127) {
 		encVal = rotaryEncRead();
 		if(encVal!=127 && encVal!=0) {
 			if(encVal>0){ControlType=1;}else{ControlType=2;}
+			#ifdef OLED
 			drawMenu_AutoManual(ControlType);
+			#endif
 			#ifdef DEBUG
-			Serial.print("ControlType is: ");
-			Serial.println(ControlType);
+			Serial.print("ControlType is: ");Serial.println(ControlType);
 			#endif
 		}
 	}
 	EEPROM.update(EEPROM_CONTROLTYPE,ControlType);	// store selected Control Type for the next time
+	#ifdef OLED
 	u8g2.clearDisplay();
+	#endif
 	// wait until button released
 	encoderLongPressmillis=millis();
 	while(rotaryEncRead() == 127){
 		if(is_rotaryEncLongPress()){
 			// go to config menu
 			configureParams();
+			encoderLongPressmillis=millis();
 		}
 	}	
 
 	if(ControlType==1){
 		ProcessStage=0; // hold temperature
-		setPoint=20;	// Allways start from 20 deg.
+		setPoint=manual_temp;	// restore last saved temperature.
 		//presetTemp = readEEPROMint(EEPROM_MANUAL_TEMP);
 		#ifdef DEBUG
 		Serial.println("Start Manual mode");
@@ -169,10 +184,9 @@ void loop() {
 	if (serial_mosfet_hyst_ms+500 < millis()) {
 		serial_mosfet_hyst_ms=millis();
 		serial_mosfet_hyst_ms = millis();
-		Serial.print("Set: ");
-		Serial.print(setPoint);
-		Serial.print(", Actual: ");
-		Serial.println(currentTemp);
+		Serial.print("Set: ");Serial.print(setPoint);
+		Serial.print(", Actual: ");Serial.print(currentTemp);
+		Serial.print(", Timer: ");Serial.println(timer_seconds);
 	}	
 	#endif	
 	
@@ -182,8 +196,9 @@ void loop() {
 		timer_millis=millis();
 		if(timer_active){timer_seconds+=seconds_passed;}
 	}
-	
+	#ifdef OLED
 	printHeaterState(); //print icon of the heater ON/OFF state
+	#endif
 
 }
 
@@ -205,22 +220,36 @@ void doManualReflow(){
 	while (encVal == 127) { //loop here while button is pressed (waiting longer than 2 seconds will reset the board (Exit to the init menu).
 		encVal = rotaryEncRead();
 		if(encVal!=127 && encVal!=0) {
-			setPoint = constrain(setPoint+encVal,20,300);
+			manual_temp = constrain(manual_temp+encVal,20,300);
+			setPoint = manual_temp;
+			#ifdef DEBUG
+			Serial.print("manual_temp changed to: ");Serial.println(manual_temp);
+			#endif
+		}else if(encVal==127){
+			// if button is pressed - store manual temp setting
+			writeEEPROMint(EEPROM_MANUAL_TEMP,manual_temp);
+			#ifdef DEBUG
+			Serial.print("Store manual_temp to EEPROM: ");Serial.println(manual_temp);
+			#endif
+			waitUntilButtonReleased();
+
 		}
 	}
 	// draw screen
+	#ifdef OLED
 	u8g2.clearBuffer();
 	printManual();
 	printPresetTemperature();
 	printTime(timer_seconds);
 	printCurrentTemperature();
-	
 	u8g2.sendBuffer();
+	#endif
 	
 	if(currentTemp>=(setPoint-5)){timer_active=true;} else {timer_active=false;}	// Timer running if temperature near or reached preset temp.
 }
 
 void doAutoReflow(){
+	#ifdef OLED
 	u8g2.clearBuffer();
 
 	printPresetTemperature();
@@ -228,4 +257,5 @@ void doAutoReflow(){
 	printCurrentTemperature();
 
 	u8g2.sendBuffer();
+	#endif
 }

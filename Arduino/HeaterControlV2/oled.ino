@@ -133,8 +133,10 @@ void printNumber00(uint8_t n) {
 void printHeaterState(){
 	if(digitalRead(MOSFET_PIN)){
 		u8g2.drawXBMP( 120, 0, 8, 14, u8g_clear_bits);
+		digitalWrite(LED_PIN, LOW);
 	}else{
 		u8g2.drawXBMP( 120, 0, 8, 14, u8g_heating_bits);
+		digitalWrite(LED_PIN, HIGH);
 	}
 }
 
