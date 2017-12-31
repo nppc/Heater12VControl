@@ -22,7 +22,7 @@
 
 
 
-#define MOSFET_PIN 		A1
+#define MOSFET_PIN 		6
 #define LED_PIN 		13
 #define TEMPSENSOR_PIN 	A0
 
@@ -40,15 +40,15 @@
 
 // some macros: 
 // mosfet (HIGH - OFF, LOW - ON)
-#define H_ON 	digitalWrite(MOSFET_PIN,LOW)
-#define H_OFF 	digitalWrite(MOSFET_PIN,HIGH)
+#define H_ON 	digitalWrite(MOSFET_PIN,HIGH)
+#define H_OFF 	digitalWrite(MOSFET_PIN,LOW)
 
 uint8_t ControlType;		// 1 - Manual or 2 - Auto
 uint8_t ProcessStage;		// 0 - just hold manual temperature; 1 - Ramp to Preheat; 2 - Preheat; 3 - Ramp to Reflow; 4 - Reflow; 5 - Cool down; 255 - finished
 
 // PID global variables
 int WindowSize = 500;
-#define PID_VALUES_FACTOR 100.0	//PID values are stored in EEPROM in int format. So, scale them (div/mult) before use.
+#define PID_VALUES_FACTOR 10.0	//PID values are stored in EEPROM in int format. So, scale them (div/mult) before use.
 
 double currentTemp=0;
 double setPoint=0;
@@ -129,6 +129,7 @@ void setup(){
 			Serial.print("ControlType is: ");Serial.println(ControlType);
 			#endif
 		}
+		digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);
 	}
 	EEPROM.update(EEPROM_CONTROLTYPE,ControlType);	// store selected Control Type for the next time
 	#ifdef OLED
@@ -177,7 +178,11 @@ void loop() {
 
 	uint16_t smoothADC = digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);
 	currentTemp = analog2temp(smoothADC);
-	myPID.Compute();
+	if(abs(setPoint-currentTemp)<10){
+		myPID.Compute();
+	}else{
+		if(setPoint > currentTemp){outputVal=WindowSize;}else{outputVal=0;}
+	}
 	doSoftwarePWM((uint16_t)outputVal);	// make slow PWM to prevent unnecessary mosfet heating 
 	
 	// debug 

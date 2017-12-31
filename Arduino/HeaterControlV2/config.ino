@@ -3,7 +3,7 @@ void configureParams(){
 	Serial.println("Enter Config");
 	#endif
 	uint8_t item = 1;
-	uint16_t value;
+	int value;
 	boolean edit = false;
 	printConfParam(item, value, edit);
 
@@ -20,19 +20,19 @@ void configureParams(){
 				// adjust selected value
 				switch (item) {
 					case 1:
-						pid_P = constrain(pid_P+encVal,1,999);
+						pid_P = constrain(pid_P+encVal*10,0,990);
 						value=pid_P;
 						break;
 					case 2:
-						pid_I = constrain(pid_I+encVal,1,999);
+						pid_I = constrain(pid_I+encVal,0,100);
 						value=pid_I;
 						break;
 					case 3:
-						pid_D = constrain(pid_D+encVal,1,999);
+						pid_D = constrain(pid_D+encVal*10,0,990);
 						value=pid_D;
 						break;
 					case 4:	// Preheat temperature
-						auto_preheatTemp = constrain(auto_preheatTemp+encVal,1,300);
+						auto_preheatTemp = constrain(auto_preheatTemp+encVal,20,300);
 						value = auto_preheatTemp;
 						break;
 					case 5: // Preheat time in seconds
@@ -40,7 +40,7 @@ void configureParams(){
 						value = auto_preheatTime;
 						break;
 					case 6: // Reflow temperature
-						auto_reflowTemp = constrain(auto_reflowTemp+encVal,1,300);
+						auto_reflowTemp = constrain(auto_reflowTemp+encVal,20,300);
 						value = auto_reflowTemp;
 						break;
 					case 7: // Reflow time in seconds
@@ -56,12 +56,14 @@ void configureParams(){
 		if(encVal==127){ // button is pressed
 			if(item==8){
 				store_settingsEEPROM();
-				break;	// exit from procedure
+				while(1){}	// exit to beginning
+				//break;	// exit from procedure
 				// switch edit mode
 			}
 			edit=!edit;
 			waitUntilButtonReleased();
 		}
+		WDT_Init();
 	}
 	#ifdef DEBUG
 	Serial.println("Exit Config");
