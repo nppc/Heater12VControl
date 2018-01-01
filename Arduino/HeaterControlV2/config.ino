@@ -55,11 +55,11 @@ void configureParams(){
 		}
 		if(encVal==127){ // button is pressed
 			if(item==8){
+				printSavingSettings();
 				store_settingsEEPROM();
-				while(1){}	// exit to beginning
-				//break;	// exit from procedure
-				// switch edit mode
+				while(1){}	// reboot board
 			}
+			// switch edit mode
 			edit=!edit;
 			waitUntilButtonReleased();
 		}
@@ -69,6 +69,16 @@ void configureParams(){
 	Serial.println("Exit Config");
 	#endif
 
+}
+
+void printSavingSettings(){
+	#ifdef OLED
+	u8g2.clearBuffer();
+	u8g2.setCursor(0, 12);
+	u8g2.print(F("Saving..."));
+	u8g2.sendBuffer();
+	#endif
+	
 }
 
 // item - number of configurable item
