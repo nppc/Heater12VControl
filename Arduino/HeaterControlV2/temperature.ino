@@ -2,7 +2,7 @@
 
 
 float analog2temp(uint16_t raw) {
-	if (raw==(1023 * OVERSAMPLENR)) {
+	if (raw>(1020 * OVERSAMPLENR)) {	// consider sensor is disconnected
 		return 999.9;
 	}
     float celsius = 0;

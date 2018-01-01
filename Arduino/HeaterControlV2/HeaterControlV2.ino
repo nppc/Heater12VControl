@@ -40,8 +40,8 @@
 
 // some macros: 
 // mosfet (HIGH - OFF, LOW - ON)
-#define H_ON 	digitalWrite(MOSFET_PIN,HIGH);digitalWrite(LED_PIN, LOW);
-#define H_OFF 	digitalWrite(MOSFET_PIN,LOW);digitalWrite(LED_PIN, HIGH);
+#define H_ON 	digitalWrite(MOSFET_PIN,HIGH);digitalWrite(LED_PIN, HIGH);
+#define H_OFF 	digitalWrite(MOSFET_PIN,LOW);digitalWrite(LED_PIN, LOW);
 
 uint8_t ControlType;		// 1 - Manual or 2 - Auto
 uint8_t ProcessStage;		// 0 - just hold manual temperature; 1 - Ramp to Preheat; 2 - Preheat; 3 - Ramp to Reflow; 4 - Reflow; 5 - Cool down; 255 - finished
@@ -74,10 +74,9 @@ boolean timer_active=false;
 void setup(){
 	
 	wdt_disable();
-	H_OFF
 	pinMode(MOSFET_PIN,OUTPUT);
 	pinMode(LED_PIN,OUTPUT);
-	digitalWrite(LED_PIN, LOW);
+	H_OFF
 
 	#ifdef DEBUG
 		Serial.begin(115200);
