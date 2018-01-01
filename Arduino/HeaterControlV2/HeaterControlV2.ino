@@ -1,9 +1,10 @@
 //*********************
 // * HW CONFIGURATION *
 //*********************
-#define DEBUG	// output the results to Serial
-//#define OLED	// Use OLED display
-#define LOGGER
+//#define DEBUG	// output the results to Serial
+#define OLED	// Use OLED display
+#define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
+#define VIRTUALTEMPERATURE
 //*********************
 
 
@@ -48,6 +49,7 @@ uint8_t ProcessStage;		// 0 - just hold manual temperature; 1 - Ramp to Preheat;
 
 // PID global variables
 #define PID_WINDOWSIZE 500	// upper limit of PID output
+#define PID_ABSTEMPDIFFERENCE 10	// Difference in set and current temperature when PID should not work.
 #define PID_VALUES_FACTOR 10.0	//PID values are stored in EEPROM in int format. So, scale them (div/mult) before use.
 
 double currentTemp=0;
@@ -68,7 +70,12 @@ boolean timer_active=false;
 
 
 #ifdef DEBUG
-	unsigned long serial_mosfet_hyst_ms = 0;
+	unsigned long serial_ms = 0;
+#endif
+
+#ifdef VIRTUALTEMPERATURE
+	unsigned long virtualTemperature_ms = 0;
+	boolean virtualTemperature_Direction = true;
 #endif
 
 void setup(){
@@ -94,7 +101,7 @@ void setup(){
 	#ifdef DEBUG
 		//initialize ADC smoother array for Debug output here...
 		for(uint8_t i=0;i<filterSamples*2;i++){digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);}
-		Serial.print("Temperature Sensor: ");
+		Serial.print(F("Temperature Sensor: "));
 		Serial.println(analog2temp(digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray)));
 	#endif
 	
@@ -113,7 +120,7 @@ void setup(){
 	drawMenu_AutoManual(ControlType);
 	#endif
 	#ifdef DEBUG
-	Serial.print("ControlType is: ");Serial.println(ControlType);
+	Serial.print(F("ControlType is: "));Serial.println(ControlType);
 	#endif
 	char encVal = 0;  // signed value - nothing is pressed
 	while (encVal != 127) {
@@ -124,7 +131,7 @@ void setup(){
 			drawMenu_AutoManual(ControlType);
 			#endif
 			#ifdef DEBUG
-			Serial.print("ControlType is: ");Serial.println(ControlType);
+			Serial.print(F("ControlType is: "));Serial.println(ControlType);
 			#endif
 		}
 		digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray); // refresh ADC array to have fresh values there
@@ -147,19 +154,23 @@ void setup(){
 		ProcessStage=0; // hold temperature
 		setPoint=manual_temp;	// last saved temperature.
 		#ifdef DEBUG
-		Serial.println("Start Manual mode");
+		Serial.println(F("Start Manual mode"));
 		#endif
 	}else{
 		ProcessStage=1; // ramp to preheat temperature
 		//presetTemp = readEEPROMint(EEPROM_AUTO_PREHEAT_TEMP);
 		#ifdef DEBUG
-		Serial.println("Start Automatic mode");
+		Serial.println(F("Start Automatic mode"));
 		#endif
 	}
 	
 	myPID.SetMode(AUTOMATIC); // turn on PID
 	
 	timer_seconds=0;
+	
+	#ifdef VIRTUALTEMPERATURE
+		currentTemp=setPoint-PID_ABSTEMPDIFFERENCE*2;
+	#endif
 		
 }
 
@@ -173,10 +184,22 @@ void loop() {
 		doAutoReflow();
 	}
 
+	
+	#ifdef VIRTUALTEMPERATURE
+	if (virtualTemperature_ms+1000 < millis()) {
+		virtualTemperature_ms = millis();
+		currentTemp += (virtualTemperature_Direction ? 0.4: -0.4);
+		if(virtualTemperature_Direction && currentTemp>setPoint+PID_ABSTEMPDIFFERENCE){virtualTemperature_Direction=false;}
+		if(!virtualTemperature_Direction && currentTemp<setPoint-PID_ABSTEMPDIFFERENCE-1){virtualTemperature_Direction=true;}
+	}
+	#else
 	uint16_t smoothADC = digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);
 	currentTemp = analog2temp(smoothADC);
+	#endif
+
+	
 	// use PID only when difference is small (to prevent windup of I)
-	if(abs(setPoint-currentTemp)<10){
+	if(abs(setPoint-currentTemp)<PID_ABSTEMPDIFFERENCE){
 		myPID.Compute();
 	}else{
 		outputVal = (setPoint > currentTemp ? PID_WINDOWSIZE : 0); // ON/OFF control
@@ -185,13 +208,12 @@ void loop() {
 	
 	// debug 
 	#ifdef DEBUG
-	if (serial_mosfet_hyst_ms+1000 < millis()) {
-		serial_mosfet_hyst_ms=millis();
-		serial_mosfet_hyst_ms = millis();
-		Serial.print("Set: ");Serial.print(setPoint);
-		Serial.print(", Actual: ");Serial.print(currentTemp);
-		Serial.print(", PWM: ");Serial.print(outputVal);
-		Serial.print(", Timer: ");Serial.println(timer_seconds);
+	if (serial_ms+1000 < millis()) {
+		serial_ms = millis();
+		Serial.print(F("Set: "));Serial.print(setPoint);
+		Serial.print(F(", Actual: "));Serial.print(currentTemp);
+		Serial.print(F(", PWM: "));Serial.print(outputVal);
+		Serial.print(F(", Timer: "));Serial.println(timer_seconds);
 	}	
 	#endif	
 	
@@ -228,14 +250,14 @@ void doManualReflow(){
 			manual_temp = constrain(manual_temp+encVal,20,300);
 			setPoint = manual_temp;
 			#ifdef DEBUG
-			Serial.print("manual_temp changed to: ");Serial.println(manual_temp);
+			Serial.print(F("manual_temp changed to: "));Serial.println(manual_temp);
 			#endif
 		}else if(encVal==127){
 			H_OFF	// turn off heater, because we will freeze here for some time...
 			// if button is pressed - store manual temp setting
 			writeEEPROMint(EEPROM_MANUAL_TEMP,manual_temp);
 			#ifdef DEBUG
-			Serial.print("Store manual_temp to EEPROM: ");Serial.println(manual_temp);
+			Serial.print(F("Store manual_temp to EEPROM: "));Serial.println(manual_temp);
 			#endif
 			waitUntilButtonReleased();
 

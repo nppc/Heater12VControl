@@ -1,6 +1,6 @@
 void configureParams(){
 	#ifdef DEBUG
-	Serial.println("Enter Config");
+	Serial.println(F("Enter Config"));
 	#endif
 	uint8_t item = 1;
 	int value;
@@ -66,7 +66,7 @@ void configureParams(){
 		WDT_Init();
 	}
 	#ifdef DEBUG
-	Serial.println("Exit Config");
+	Serial.println(F("Exit Config"));
 	#endif
 
 }
@@ -122,10 +122,10 @@ void printConfParam(uint8_t item, uint16_t value, boolean edit){
 	u8g2.sendBuffer();
 	#endif
 	#ifdef DEBUG
-	Serial.println("Change Config");
-	Serial.print("item: ");Serial.println(item);
-	Serial.print("value: ");Serial.println(value);
-	Serial.print("edit: ");Serial.println(edit);
+	Serial.println(F("Change Config"));
+	Serial.print(F("item: "));Serial.println(item);
+	Serial.print(F("value: "));Serial.println(value);
+	Serial.print(F("edit: "));Serial.println(edit);
 	#endif
 	
 }

@@ -10,31 +10,31 @@ void restore_settingsEEPROM(){
 	ControlType = constrain(EEPROM.read(EEPROM_CONTROLTYPE), 1, 2);
 
 	#ifdef DEBUG
-		Serial.println("Restore EEPROM Settings");
-		Serial.print("pid_P: ");Serial.println(pid_P);
-		Serial.print("pid_I: ");Serial.println(pid_I);
-		Serial.print("pid_D: ");Serial.println(pid_D);
-		Serial.print("manual_temp: ");Serial.println(manual_temp);
-		Serial.print("auto_preheatTemp: ");Serial.println(auto_preheatTemp);
-		Serial.print("auto_preheatTime: ");Serial.println(auto_preheatTime);
-		Serial.print("auto_reflowTemp: ");Serial.println(auto_reflowTemp);
-		Serial.print("auto_reflowTime: ");Serial.println(auto_reflowTime);
-		Serial.print("ControlType: ");Serial.println(ControlType);
+		Serial.println(F("Restore EEPROM Settings"));
+		Serial.print(F("pid_P: "));Serial.println(pid_P);
+		Serial.print(F("pid_I: "));Serial.println(pid_I);
+		Serial.print(F("pid_D: "));Serial.println(pid_D);
+		Serial.print(F("manual_temp: "));Serial.println(manual_temp);
+		Serial.print(F("auto_preheatTemp: "));Serial.println(auto_preheatTemp);
+		Serial.print(F("auto_preheatTime: "));Serial.println(auto_preheatTime);
+		Serial.print(F("auto_reflowTemp: "));Serial.println(auto_reflowTemp);
+		Serial.print(F("auto_reflowTime: "));Serial.println(auto_reflowTime);
+		Serial.print(F("ControlType: "));Serial.println(ControlType);
 	#endif
 	
 }
 
 void store_settingsEEPROM(){
 	#ifdef DEBUG
-		Serial.println("Write EEPROM Settings");
-		Serial.print("pid_P: ");Serial.println(pid_P);
-		Serial.print("pid_I: ");Serial.println(pid_I);
-		Serial.print("pid_D: ");Serial.println(pid_D);
+		Serial.println(F("Write EEPROM Settings"));
+		Serial.print(F("pid_P: "));Serial.println(pid_P);
+		Serial.print(F("pid_I: "));Serial.println(pid_I);
+		Serial.print(F("pid_D: "));Serial.println(pid_D);
 		//Serial.print("manual_temp: ");Serial.println(manual_temp);
-		Serial.print("auto_preheatTemp: ");Serial.println(auto_preheatTemp);
-		Serial.print("auto_preheatTime: ");Serial.println(auto_preheatTime);
-		Serial.print("auto_reflowTemp: ");Serial.println(auto_reflowTemp);
-		Serial.print("auto_reflowTime: ");Serial.println(auto_reflowTime);
+		Serial.print(F("auto_preheatTemp: "));Serial.println(auto_preheatTemp);
+		Serial.print(F("auto_preheatTime: "));Serial.println(auto_preheatTime);
+		Serial.print(F("auto_reflowTemp: "));Serial.println(auto_reflowTemp);
+		Serial.print(F("auto_reflowTime: "));Serial.println(auto_reflowTime);
 		//Serial.print("ControlType: ");Serial.println(ControlType);
 	#endif
 
