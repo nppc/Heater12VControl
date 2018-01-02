@@ -2,12 +2,12 @@ void restore_settingsEEPROM(){
 	pid_P = constrain(readEEPROMint(EEPROM_PID_P),0,990);
 	pid_I = constrain(readEEPROMint(EEPROM_PID_I),0,100);
 	pid_D = constrain(readEEPROMint(EEPROM_PID_D),0,990);
-	manual_temp = constrain(readEEPROMint(EEPROM_MANUAL_TEMP),1,300);
+	manual_temp = constrain(readEEPROMint(EEPROM_MANUAL_TEMP),20,300);
 	auto_preheatTemp = constrain(readEEPROMint(EEPROM_AUTO_PREHEAT_TEMP),20,300);
-	auto_preheatTime = constrain(readEEPROMint(EEPROM_AUTO_PREHEAT_TIME),1,999);
+	auto_preheatTime = constrain(readEEPROMint(EEPROM_AUTO_PREHEAT_TIME),10,990);
 	auto_reflowTemp = constrain(readEEPROMint(EEPROM_AUTO_REFLOW_TEMP),20,300);
-	auto_reflowTime = constrain(readEEPROMint(EEPROM_AUTO_REFLOW_TIME),1,999);
-	ControlType = constrain(EEPROM.read(EEPROM_CONTROLTYPE), 1, 2);
+	auto_reflowTime = constrain(readEEPROMint(EEPROM_AUTO_REFLOW_TIME),10,990);
+	ControlType = constrain(EEPROM.read(EEPROM_CONTROLTYPE), 0, 1);
 
 	#ifdef DEBUG
 		Serial.println(F("Restore EEPROM Settings"));

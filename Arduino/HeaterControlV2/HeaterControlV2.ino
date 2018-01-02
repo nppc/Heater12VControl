@@ -4,7 +4,7 @@
 //#define DEBUG	// output the results to Serial
 #define OLED	// Use OLED display
 #define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
-#define VIRTUALTEMPERATURE
+//#define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
 //*********************
 
 
@@ -44,8 +44,8 @@
 #define H_ON 	digitalWrite(MOSFET_PIN,HIGH);digitalWrite(LED_PIN, HIGH);
 #define H_OFF 	digitalWrite(MOSFET_PIN,LOW);digitalWrite(LED_PIN, LOW);
 
-uint8_t ControlType;		// 1 - Manual or 2 - Auto
-uint8_t ProcessStage;		// 0 - just hold manual temperature; 1 - Ramp to Preheat; 2 - Preheat; 3 - Ramp to Reflow; 4 - Reflow; 5 - Cool down; 255 - finished
+uint8_t ControlType;		// 0 - Manual or 1 - Auto
+//uint8_t ProcessStage;		// 0 - just hold manual temperature; 1 - Ramp to Preheat; 2 - Preheat; 3 - Ramp to Reflow; 4 - Reflow; 5 - Cool down; 255 - finished
 
 // PID global variables
 #define PID_WINDOWSIZE 500	// upper limit of PID output
@@ -65,8 +65,10 @@ unsigned long soft_pwm_millis=0;
 PID myPID(&currentTemp, &outputVal, &setPoint, 0, 0, 0, DIRECT); // PID values will be set later
 
 unsigned long timer_millis;
-uint16_t timer_seconds;
+int timer_seconds;
 boolean timer_active=false;
+unsigned long timer_editable_millis;
+boolean timer_editable=false;
 
 
 #ifdef DEBUG
@@ -126,7 +128,7 @@ void setup(){
 	while (encVal != 127) {
 		encVal = rotaryEncRead();
 		if(encVal!=127 && encVal!=0) {
-			if(encVal>0){ControlType=1;}else{ControlType=2;}
+			if(encVal>0){ControlType=0;}else{ControlType=1;}
 			#ifdef OLED
 			drawMenu_AutoManual(ControlType);
 			#endif
@@ -150,23 +152,23 @@ void setup(){
 		}
 	}	
 
-	if(ControlType==1){
-		ProcessStage=0; // hold temperature
+	if(ControlType==0){
 		setPoint=manual_temp;	// last saved temperature.
 		#ifdef DEBUG
 		Serial.println(F("Start Manual mode"));
 		#endif
 	}else{
-		ProcessStage=1; // ramp to preheat temperature
-		//presetTemp = readEEPROMint(EEPROM_AUTO_PREHEAT_TEMP);
+		setPoint=auto_preheatTemp;
 		#ifdef DEBUG
 		Serial.println(F("Start Automatic mode"));
 		#endif
 	}
-	
+
+	timer_seconds=0;
+	timer_active=false;
+
 	myPID.SetMode(AUTOMATIC); // turn on PID
 	
-	timer_seconds=0;
 	
 	#ifdef VIRTUALTEMPERATURE
 		currentTemp=setPoint-PID_ABSTEMPDIFFERENCE*2;
@@ -178,7 +180,7 @@ void loop() {
 	
 	WDT_Init();	// keep system alive
 	
-	if(ControlType==1){
+	if(ControlType==0){
 		doManualReflow();
 	}else{
 		doAutoReflow();
@@ -217,11 +219,11 @@ void loop() {
 	}	
 	#endif	
 	
-	// increment timer
+	// increment or decrement timer
 	if(timer_millis+1000<millis()) {
 		uint16_t seconds_passed=(millis()-timer_millis)/1000;
 		timer_millis=millis();
-		if(timer_active){timer_seconds+=seconds_passed;}
+		if(timer_active){timer_seconds+=(ControlType==0 ? seconds_passed : -seconds_passed);} // increment only in manual mode.
 	}
 	#ifdef OLED
 	printHeaterState(); //print icon of the heater ON/OFF state
@@ -260,7 +262,6 @@ void doManualReflow(){
 			Serial.print(F("Store manual_temp to EEPROM: "));Serial.println(manual_temp);
 			#endif
 			waitUntilButtonReleased();
-
 		}
 	}
 	// draw screen
@@ -276,17 +277,93 @@ void doManualReflow(){
 	logger128secOLED();
 	#endif
 	
-	if(currentTemp>=(setPoint-5)){timer_active=true;} else {timer_active=false;}	// Timer running if temperature near or reached preset temp.
+	if(currentTemp>=(setPoint-2)){timer_active=true;} else {timer_active=false;}	// Timer running if temperature near or reached preset temp.
 }
 
 void doAutoReflow(){
+	int val_adjust=0;	// for adjusting temperature or time on the fly
+	// check encoder
+	char encVal = 127;  // signed value - just enter to the loop
+	while (encVal == 127) { //loop here while button is pressed (waiting longer than 2 seconds will reset the board (Exit to the init menu).
+		encVal = rotaryEncRead();
+		if(encVal!=127) {
+			val_adjust = encVal;
+		}else if(encVal==127){
+			H_OFF	// turn off heater, because we will freeze here for some time...
+			waitUntilButtonReleased();
+			timer_editable = !timer_editable;	// change timer edit mode
+			timer_editable_millis=millis();		// start timer for edit time within 3 seconds
+		}
+	}
+
+	// adjust current temperature or timer
+	if(val_adjust!=0 && ControlType<5){
+		if(timer_editable){
+			timer_seconds=constrain(timer_seconds+val_adjust,0,990);
+			timer_editable_millis=millis();
+		}else{
+			setPoint=constrain((int)setPoint+val_adjust,20,300);
+		}
+	}
+	// reset timer_editable flag if edit time expired
+	if(timer_editable && timer_editable_millis+3000<millis()) {
+		timer_editable=false;
+	}
+	
+	
+	// process current step (variable ControlType)
+	switch (ControlType) {
+		case 1:	// ramp to preheat temperature
+			// setpoint is already set...
+			// wait until temperature is reached the auto_preheatTemp. Then go to the next step
+			if(currentTemp>=(setPoint-2)){
+				timer_seconds=auto_preheatTime;
+				timer_active=true;
+				ControlType=2;	// go to the next step
+			}
+			break;
+		case 2:	// wait for timer
+			if(timer_seconds<=0){
+				timer_seconds=0;
+				timer_active=false;
+				setPoint=auto_reflowTemp;	// set temperature for next step
+				ControlType=3;	// go to the next step
+			}
+			break;
+		case 3:	// ramp to reflow temperature
+			// wait until temperature is reached the auto_preheatTemp. Then go to the next step
+			if(currentTemp>=(setPoint-2)){
+				timer_seconds=auto_reflowTime;
+				timer_active=true;
+				ControlType=4;	// go to the next step
+			}
+			break;
+		case 4:	// wait for timer
+			if(timer_seconds<=0){
+				timer_seconds=0;
+				timer_active=false;
+				setPoint=20;	// Cool down
+				ControlType=5;	// go to the next step
+			}
+			break;
+		case 5:	// wait for cooling down
+			if(currentTemp<50){ControlType=6;}	// on the next step do nothing
+	}	
+
 	#ifdef OLED
 	u8g2.clearBuffer();
-
+	printAuto();
 	printPresetTemperature();
-	printTime(timer_seconds);
+	if(timer_editable){
+		u8g2.setDrawColor(2);	// Xor mode
+		u8g2.drawBox(89,0,24,11);
+		printTime(timer_seconds);
+		u8g2.setDrawColor(1);	// Normal mode
+	}else{
+		printTime(timer_seconds);
+	}
 	printCurrentTemperature();
-
+	
 	u8g2.sendBuffer();
 	#endif
 }

@@ -36,7 +36,7 @@ void configureParams(){
 						value = auto_preheatTemp;
 						break;
 					case 5: // Preheat time in seconds
-						auto_preheatTime = constrain(auto_preheatTime+encVal,1,999);
+						auto_preheatTime = constrain(auto_preheatTime+encVal*10,10,990);
 						value = auto_preheatTime;
 						break;
 					case 6: // Reflow temperature
@@ -44,7 +44,7 @@ void configureParams(){
 						value = auto_reflowTemp;
 						break;
 					case 7: // Reflow time in seconds
-						auto_reflowTime = constrain(auto_reflowTime+encVal,1,999);
+						auto_reflowTime = constrain(auto_reflowTime+encVal*10,10,990);
 						value = auto_reflowTime;
 						break;
 				} 
