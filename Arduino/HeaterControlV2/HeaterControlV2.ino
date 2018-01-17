@@ -4,7 +4,7 @@
 //#define DEBUG	// output the results to Serial
 #define OLED	// Use OLED display
 #define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
-//#define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
+#define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
 //*********************
 
 
@@ -93,11 +93,6 @@ void setup(){
 	
 	#ifdef OLED
 		u8g2.begin();
-		//u8g2.clearBuffer();
-		//u8g2.setFont(u8g2_font_inb16_mr);
-		//u8g2_font_t0_22_tn - numeric font for current temperature
-		//u8g2_font_profont12_tn - numeric font for preset temperature and timer
-		
 	#endif
 	
 	#ifdef DEBUG

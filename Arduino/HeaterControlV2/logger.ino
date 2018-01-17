@@ -8,6 +8,8 @@ void logger128secOLED(){
 	if(loggerMillis+2000<millis()){	// step every 2 seconds
 		loggerMillis=millis();
 		#ifdef OLED
+		u8g2.setFontMode(0);
+		u8g2.setDrawColor(1);
 		u8g2.setFont(u8g2_font_profont12_tn);
 		#endif
 		// Y=15 is setPoint
@@ -26,7 +28,7 @@ void logger128secOLED(){
 				// we are in printable area...
 				#ifdef OLED
 				// draw dots in middle of 128x32 OLED
-				for(uint8_t i=0;i<128;i+=2){
+				for(uint8_t i=0;i<128;i+=4){
 					u8g2.drawPixel(i,16);
 				}
 				loggerPrintNumbers(curTmp, setPnt);
@@ -57,10 +59,13 @@ void logger128secOLED(){
 void loggerPrintNumbers(uint16_t curTmp, uint16_t setPnt) {
 	// print current temperature
 	u8g2.setCursor(0, 10);
+	if(curTmp<100){u8g2.print("0");}
 	u8g2.print(curTmp);
 	// print preset temperature
 	u8g2.setCursor(100, 10);
+	if(setPnt<100){u8g2.print("0");}
 	u8g2.print(setPnt);
+
 }
 #endif
 

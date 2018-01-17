@@ -145,25 +145,29 @@ static const uint8_t u8g_autoStep3_bits[] U8X8_PROGMEM = {
 
 // Draw initial menu with selected item (1 - Auto, 2 - Manual)
 void drawMenu_AutoManual(uint8_t sel) {
-	if(sel==1){
-		u8g2.drawRBox(0,4,50,24,4);
-		u8g2.drawRFrame(44,4,70,24,4);
-	}else{
-		u8g2.drawRFrame(0,4,50,24,4);
-		u8g2.drawRBox(44,4,70,24,4);
-	}
-	
+	u8g2.clearBuffer();
 	u8g2.setFontMode(1);  // activate transparent font mode
+	if(sel==1){
+		u8g2.drawRBox(0,4,51,25,4);
+		u8g2.drawRFrame(55,4,73,25,4);
+	}else{
+		u8g2.drawRFrame(0,4,51,25,4);
+		u8g2.drawRBox(55,4,73,25,4);
+	}
+	u8g2.setFont(u8g2_font_t0_22_mf);
 	u8g2.setDrawColor(2);	// Xor
-	u8g2.drawStr(3,8,"Auto");
-	u8g2.drawStr(47,8,"Manual");
+	u8g2.drawStr(3,24,"Auto");
+	u8g2.drawStr(59,24,"Manual");
+	u8g2.sendBuffer();
 }
 
+// this routine is a part of other routine, so no sendBuffer...
 void printManual(){
-	u8g2.setDrawColor(0);	// invert bitmap
+	u8g2.setDrawColor(1);	// invert bitmap
 	u8g2.drawXBMP( 0, 0, 40, 10, u8g_manual_bits);
 }
-	
+
+// this routine is a part of other routine, so no sendBuffer...	
 void printPresetTemperature(){
 	u8g2.setFont(u8g2_font_profont12_tn);	//numeric font for preset temperature and timer
 	u8g2.setDrawColor(2);	// Xor mode
@@ -174,6 +178,7 @@ void printPresetTemperature(){
 	u8g2.drawXBMP(tmpcoord, 0, 40, 10, u8g_celsius_bits);
 }
 
+// this routine is a part of other routine, so no sendBuffer...	
 // mm:ss
 void printTime(uint16_t t) {
 	u8g2.setCursor(90, 10);
@@ -184,6 +189,7 @@ void printTime(uint16_t t) {
 	u8g2.print(':');
 	printNumber00(s);
 }
+// this routine is a part of other routine, so no sendBuffer...	
 void printNumber00(uint8_t n) {
 	if (n<10) {u8g2.print('0');}
 	u8g2.print(n);
@@ -199,6 +205,7 @@ void printHeaterState(){
 	}
 }
 
+// this routine is a part of other routine, so no sendBuffer...	
 void printCurrentTemperature(){
 	u8g2.setFont(u8g2_font_t0_22_tn);	//numeric font for current temperature
 	u8g2.setDrawColor(1);	// Normal mode
