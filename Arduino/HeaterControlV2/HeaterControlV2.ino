@@ -175,11 +175,14 @@ void setup(){
 
 void loop() {
 	
+	// Exit by holding button for 2 seconds...
 	WDT_Init();	// keep system alive
 	
 	if(ControlType==0){
+		adjustValues(1);	//adjust values on the fly (only preset temp to adjust)
 		doManualReflow();
 	}else{
+		adjustValues(2);	//adjust values on the fly (adjust both, preset temp and timer)
 		doAutoReflow();
 	}
 
@@ -237,29 +240,18 @@ void doSoftwarePWM(uint16_t pwm_val){
 }
 
 void doManualReflow(){
-	// Exit from manual state by holding button for 2 seconds...
-	// Adjust preset temperature by rotating the knob
-	char encVal = 127;  // signed value - just enter to the loop
-	while (encVal == 127) { //loop here while button is pressed (waiting longer than 2 seconds will reset the board (Exit to the init menu).
-		encVal = rotaryEncRead();
-		if(encVal!=127 && encVal!=0) {
-			manual_temp = constrain(manual_temp+encVal,20,300);
-			setPoint = manual_temp;
-		}else if(encVal==127){
-			H_OFF	// turn off heater, because we will freeze here for some time...
-			// if button is pressed - store manual temp setting
-			writeEEPROMint(EEPROM_MANUAL_TEMP,manual_temp);
-			waitUntilButtonReleased();
-		}
-	}
 	// draw screen
 	#if defined (OLED) && !defined (LOGGER)
 	u8g2.clearBuffer();
 	printManual();
+
+	if(value_editable==1){
+		u8g2.drawBox(46,0,33,10);
+	}
+
 	printPresetTemperature();
 	printTime(timer_seconds);
 	printCurrentTemperature();
-
 	printHeaterState(); //print icon of the heater ON/OFF state
 
 	u8g2.sendBuffer();
@@ -272,38 +264,6 @@ void doManualReflow(){
 }
 
 void doAutoReflow(){
-	int val_adjust=0;	// for adjusting temperature or time on the fly
-	// check encoder
-	char encVal = 127;  // signed value - just enter to the loop
-	while (encVal == 127) { //loop here while button is pressed (waiting longer than 2 seconds will reset the board (Exit to the init menu).
-		encVal = rotaryEncRead();
-		if(encVal!=127 && value_editable>0) {
-			val_adjust = encVal;
-		}else if(encVal==127){
-			H_OFF	// turn off heater, because we will freeze here for some time...
-			waitUntilButtonReleased();
-			value_editable++;	// change edit mode
-			if(value_editable>2){value_editable=0;}
-			value_editable_millis=millis();		// start timer for edit time within 3 seconds
-		}
-	}
-
-	// adjust current temperature or timer
-	if(val_adjust!=0 && ControlType<5){
-		val_adjust*=10; // adjust in 10's steps
-		if(value_editable==2){
-			timer_seconds=constrain(timer_seconds+val_adjust,0,990);
-		}else if(value_editable==1){
-			setPoint=constrain((int)setPoint+val_adjust,20,300);
-		}
-		value_editable_millis=millis();
-	}
-	// reset timer_editable flag if edit time expired
-	if(value_editable>0 && value_editable_millis+3000<millis()) {
-		value_editable=0;
-	}
-	
-	
 	// process current step (variable ControlType)
 	switch (ControlType) {
 		case 1:	// ramp to preheat temperature
@@ -355,7 +315,38 @@ void doAutoReflow(){
 	printTime(timer_seconds);
 	printCurrentTemperature();
 	printHeaterState(); //print icon of the heater ON/OFF state
+	
+	printStepTextGraphic();
 
 	u8g2.sendBuffer();
 	#endif
 }
+
+void adjustValues(uint8_t vals) {
+	int val_adjust=0;	// for adjusting temperature or time on the fly
+	char encVal = 127;  // signed value - just enter to the loop
+	while (encVal == 127) { //loop here while button is pressed (waiting longer than 2 seconds will reset the board (Exit to the init menu).
+		encVal = rotaryEncRead();
+		if(encVal!=127 && value_editable>0) {
+			val_adjust = encVal;
+		}else if(encVal==127){
+			H_OFF	// turn off heater, because we will freeze here for some time...
+			waitUntilButtonReleased();
+			value_editable++;	// change edit mode
+			if(value_editable>vals){value_editable=0;}
+			value_editable_millis=millis();		// start timer for edit time within 3 seconds
+		}
+	}
+	// adjust current temperature or timer
+	if(val_adjust!=0 && ControlType<5){
+		val_adjust*=10; // adjust in 10's steps
+		if(value_editable==2){
+			timer_seconds=constrain(timer_seconds+val_adjust,0,990);
+		}else if(value_editable==1){
+			setPoint=constrain((int)setPoint+val_adjust,20,300);
+		}
+		value_editable_millis=millis();
+	}
+	// reset timer_editable flag if edit time expired
+	if(value_editable>0 && value_editable_millis+3000<millis()) {value_editable=0;}
+}	

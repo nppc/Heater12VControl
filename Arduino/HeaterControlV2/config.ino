@@ -83,19 +83,19 @@ void printConfParam(uint8_t item, boolean edit){
 	u8g2.setCursor(0, 24);
 	switch (item) {
 		case 1:
-			u8g2.print(F("PID P:"));
+			u8g2.print(F("PID P"));
 			break;
 		case 2:
-			u8g2.print(F("PID I:"));
+			u8g2.print(F("PID I"));
 			break;
 		case 3:
-			u8g2.print(F("PID D:"));
+			u8g2.print(F("PID D"));
 			break;
 		case 4:	// Preheat temperature
-			u8g2.print(F("Warmup t"));
+			u8g2.print(F("Soak t"));
 			break;
 		case 5: // Preheat time in seconds
-			u8g2.print(F("Warmup s"));
+			u8g2.print(F("Soak s"));
 			break;
 		case 6: // Reflow temperature
 			u8g2.print(F("Reflow t"));

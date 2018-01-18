@@ -1,5 +1,5 @@
 # Heater12VControl
-Controller board (mosfet and thermistor control) for 12V heating ceramic element
+Controller board (mosfet and thermistor control) for 12V heating ceramic element with temperature PID control
 
 ### We will need:
 - 1 Heating element like XD-JR80 12V48W
@@ -13,3 +13,39 @@ Controller board (mosfet and thermistor control) for 12V heating ceramic element
 
 ![Virtual PCB](Images/CeramicHeaterNewPCB.jpg)
 ![PCB soldered](Images/PCB_soldered.jpg)
+
+## LCD screens snapshots:
+### Start menu 
+(choose two presets - manual temperature regulation or automatic reflow)
+![PCB soldered](Images/00menu.jpg)
+
+
+### Manual mode 
+- Target temperature is adjustable on the fly. 
+- Timer is counting total time while on target temperature.
+![PCB soldered](Images/01manual.jpg)
+
+### Automatic Reflow mode
+- Indication of current step (soak, reflow, cooling)
+- Timer for every step
+- Target temperature and time is adjustable on the fly. 
+(Ramp to soak step)
+![PCB soldered](Images/10warm.jpg)
+(Soak step - preheating)
+![PCB soldered](Images/11soak.jpg)
+(Ramp to reflow step)
+![PCB soldered](Images/20warm.jpg)
+(Reflow step)
+![PCB soldered](Images/21reflow.jpg)
+(Cooling down step)
+![PCB soldered](Images/30cool.jpg)
+
+### Configurable parameters
+(long button press while in start menu)
+- PID P
+- PID I
+- PID D
+- Soak temperature (preheating)
+- Soak time (preheating)
+- Reflow temperature
+- Reflow time
