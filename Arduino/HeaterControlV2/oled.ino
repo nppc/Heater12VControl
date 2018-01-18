@@ -157,10 +157,10 @@ void drawMenu_AutoManual(uint8_t sel) {
 		u8g2.drawRFrame(0,4,51,25,4);
 		u8g2.drawRBox(55,4,73,25,4);
 	}
+	u8g2.setDrawColor(2);	// restore default mode
 	u8g2.setFont(u8g2_font_t0_22_mf);
 	u8g2.drawStr(3,24,"Auto");
 	u8g2.drawStr(59,24,"Manual");
-	u8g2.setDrawColor(2);	// restore default mode
 	u8g2.sendBuffer();
 }
 

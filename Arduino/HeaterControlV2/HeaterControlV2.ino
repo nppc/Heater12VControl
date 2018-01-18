@@ -3,7 +3,7 @@
 //*********************
 //#define DEBUG	// output the results to Serial
 #define OLED	// Use OLED display
-//#define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
+#define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
 #define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
 //*********************
 
