@@ -1,3 +1,5 @@
+#define MENU_ITEMS	9
+
 void configureParams(){
 	#ifdef DEBUG
 	Serial.println(F("Enter Config"));
@@ -15,7 +17,7 @@ void configureParams(){
 		encVal = rotaryEncRead();
 		if(encVal!=0 && encVal!=127) {
 			if(!edit){
-				item=constrain(item + encVal,1, 8);
+				item=constrain(item + encVal,1, MENU_ITEMS);
 			} else {
 				// adjust selected value
 				switch (item) {
@@ -40,11 +42,14 @@ void configureParams(){
 					case 7: // Reflow time in seconds
 						auto_reflowTime = constrain(auto_reflowTime+encVal*10,10,990);
 						break;
+					case 8: // Manual temperature
+						manual_temp = constrain(manual_temp+encVal*10,20,300);
+						break;
 				} 
 			}
 		}
 		if(encVal==127){ // button is pressed
-			if(item==8){
+			if(item==MENU_ITEMS){
 				printSavingSettings();
 				store_settingsEEPROM();
 				#ifdef DEBUG
@@ -77,7 +82,7 @@ void printConfParam(uint8_t item, boolean edit){
 	#ifdef OLED
 	u8g2.clearBuffer();
 	u8g2.setDrawColor(2);	//inverse mode
-	if(edit && item != 8){
+	if(edit && item != MENU_ITEMS){
 		u8g2.drawBox(95,6,128-95,32-5*2);
 	}
 	u8g2.setCursor(0, 24);
@@ -103,11 +108,14 @@ void printConfParam(uint8_t item, boolean edit){
 		case 7: // Reflow time in seconds
 			u8g2.print(F("Reflow s"));
 			break;
-		case 8: // Save settings and exit
+		case 8: // Manual target temperature
+			u8g2.print(F("Manual t"));
+			break;
+		case 9: // Save settings and exit
 			u8g2.print(F("Save & Exit"));
 			break;
 	} 
-	if(item!=8){
+	if(item!=MENU_ITEMS){
 		u8g2.setCursor(95, 24);
 		u8g2.print(getValueForConfigItem(item));
 	}
@@ -144,5 +152,7 @@ uint16_t getValueForConfigItem(uint8_t item) {
 			break;
 		case 7: // Reflow time in seconds
 			return auto_reflowTime;
+		case 8: // Manual target temperature
+			return manual_temp;
 	} 
 }

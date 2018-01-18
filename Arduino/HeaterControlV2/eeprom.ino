@@ -30,7 +30,7 @@ void store_settingsEEPROM(){
 		Serial.print(F("pid_P: "));Serial.println(pid_P);
 		Serial.print(F("pid_I: "));Serial.println(pid_I);
 		Serial.print(F("pid_D: "));Serial.println(pid_D);
-		//Serial.print("manual_temp: ");Serial.println(manual_temp);
+		Serial.print("manual_temp: ");Serial.println(manual_temp);
 		Serial.print(F("auto_preheatTemp: "));Serial.println(auto_preheatTemp);
 		Serial.print(F("auto_preheatTime: "));Serial.println(auto_preheatTime);
 		Serial.print(F("auto_reflowTemp: "));Serial.println(auto_reflowTemp);
@@ -41,7 +41,7 @@ void store_settingsEEPROM(){
 	writeEEPROMint(EEPROM_PID_P,pid_P);
 	writeEEPROMint(EEPROM_PID_I,pid_I);
 	writeEEPROMint(EEPROM_PID_D,pid_D);
-	//writeEEPROMint(EEPROM_MANUAL_TEMP,manual_temp); // don't need to write it while it written after manual mode exit
+	writeEEPROMint(EEPROM_MANUAL_TEMP,manual_temp);
 	writeEEPROMint(EEPROM_AUTO_PREHEAT_TEMP,auto_preheatTemp);
 	writeEEPROMint(EEPROM_AUTO_PREHEAT_TIME,auto_preheatTime);
 	writeEEPROMint(EEPROM_AUTO_REFLOW_TEMP,auto_reflowTemp);

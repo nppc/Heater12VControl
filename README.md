@@ -50,3 +50,4 @@ Controller board (mosfet and thermistor control) for 12V heating ceramic element
 - Soak time (preheating)
 - Reflow temperature
 - Reflow time
+- Target temperature for Manual mode

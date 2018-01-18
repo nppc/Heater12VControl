@@ -5,22 +5,15 @@
 
 
 void logger128secOLED(){
+	int curTmp = round(currentTemp);
+	int setPnt = setPoint;
 	if(loggerMillis+2000<millis()){	// step every 2 seconds
 		loggerMillis=millis();
-		#ifdef OLED
-		u8g2.setFontMode(0);
-		u8g2.setDrawColor(1);
-		u8g2.setFont(u8g2_font_profont12_tn);
-		#endif
-		// Y=15 is setPoint
-		int curTmp = round(currentTemp);
-		int setPnt = setPoint;
 		// calculate coordinates (currently it is ok, if we are out of the screen bounds)
 		int loggerYCoord = round(16.0-(float)(curTmp-setPnt)*(16.0/(float)PID_ABSTEMPDIFFERENCE));
 		if(loggerXcoord>127 || loggerYCoord>31){
 			#ifdef OLED
 			u8g2.clearBuffer();
-			loggerPrintNumbers(curTmp, setPnt);
 			#endif
 			loggerXcoord=0;
 		} else {
@@ -50,10 +43,15 @@ void logger128secOLED(){
 		Serial.print(F("; loggerYCoord: "));Serial.println(loggerYCoord);
 		#endif
 		loggerYcoordPrev = constrain(loggerYCoord,0,31);
-		#ifdef OLED
-		u8g2.sendBuffer();
-		#endif
 	}
+	#ifdef OLED
+	u8g2.setFontMode(0);
+	u8g2.setDrawColor(1);
+	u8g2.setFont(u8g2_font_profont12_tn);
+	loggerPrintNumbers(curTmp, setPnt);
+	printHeaterState(); //print icon of the heater ON/OFF state
+	u8g2.sendBuffer();
+	#endif
 	
 }
 
