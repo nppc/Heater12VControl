@@ -3,7 +3,7 @@
 
 float analog2temp(uint16_t raw) {
 	if (raw>(1020 * OVERSAMPLENR)) {	// consider sensor is disconnected
-		return 999.9;
+		return 999.0;	// return high but 3 digit number
 	}
     float celsius = 0;
     uint8_t i;
