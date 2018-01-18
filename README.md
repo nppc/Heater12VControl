@@ -29,6 +29,7 @@ Controller board (mosfet and thermistor control) for 12V heating ceramic element
 - Indication of current step (soak, reflow, cooling)
 - Timer for every step
 - Target temperature and time is adjustable on the fly. 
+
 (Ramp to soak step)
 ![PCB soldered](Images/10warm.jpg)
 (Soak step - preheating)

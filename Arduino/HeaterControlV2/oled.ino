@@ -149,7 +149,7 @@ static const uint8_t u8g_cool_txt_bits[] U8X8_PROGMEM = {
 // Draw initial menu with selected item (1 - Auto, 2 - Manual)
 void drawMenu_AutoManual(uint8_t sel) {
 	u8g2.clearBuffer();
-	//u8g2.setFontMode(1);  // activate transparent font mode
+	u8g2.setDrawColor(1);
 	if(sel==1){
 		u8g2.drawRBox(0,4,51,25,4);
 		u8g2.drawRFrame(55,4,73,25,4);
@@ -160,6 +160,7 @@ void drawMenu_AutoManual(uint8_t sel) {
 	u8g2.setFont(u8g2_font_t0_22_mf);
 	u8g2.drawStr(3,24,"Auto");
 	u8g2.drawStr(59,24,"Manual");
+	u8g2.setDrawColor(2);	// restore default mode
 	u8g2.sendBuffer();
 }
 
@@ -175,7 +176,7 @@ void printPresetTemperature(){
 	u8g2.setCursor(48, 9);
 	uint16_t curval=(int)setPoint;
 	u8g2.print(curval);
-	uint16_t tmpcoord = 50+6*(curval<100 ? 2 : 3);	// two or three digits number
+	uint16_t tmpcoord = 49+6*(curval<100 ? 2 : 3);	// two or three digits number
 	u8g2.setBitmapMode(1);
 	u8g2.drawXBMP(tmpcoord, 0, 8, 9, u8g_celsius_bits);
 }
