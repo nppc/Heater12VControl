@@ -16,9 +16,8 @@ static const uint8_t u8g_clear_bits[] U8X8_PROGMEM = {
 	0b00000000,
 	0b00000000
 };
-//8X14
+//8X10
 static const uint8_t u8g_heating_bits[] U8X8_PROGMEM = {
-	0b10010000,
 	0b01001000,
 	0b00100100,
 	0b00100100,
@@ -27,76 +26,68 @@ static const uint8_t u8g_heating_bits[] U8X8_PROGMEM = {
 	0b10010000,
 	0b01001000,
 	0b00100100,
-	0b00100100,
-	0b00000000,
-	0b11111110,
 	0b00000000,
 	0b11111110
 };
 
 //40x10 (manual)
 static const uint8_t u8g_manual_bits[] U8X8_PROGMEM = {
-	0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,
-	0b00000000,0b00000000,0b00000000,0b00000000,0b00001000,
-	0b00000000,0b00000000,0b00000000,0b00000000,0b00001000,
-	0b00111111,0b10001110,0b00111100,0b10010011,0b10001000,
-	0b00100100,0b10000001,0b00100100,0b10010000,0b01001000,
-	0b00100100,0b10001111,0b00100100,0b10010011,0b00001000,
-	0b00100100,0b10010001,0b00100100,0b10010100,0b01001000,
-	0b00100100,0b10010001,0b00100100,0b10010100,0b01001000,
-	0b00100100,0b10001111,0b00100100,0b11110011,0b11001000,
-	0b00000000,0b00000000,0b00000000,0b00000000,0b00000000
-};
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xEF, 0xFF, 0xFF, 
+  0xFF, 0xFF, 0xEF, 0x03, 0x8E, 0xE3, 0x36, 0xEE, 0xDB, 0x7E, 0xDB, 0xF6, 
+  0xED, 0xDB, 0x0E, 0xDB, 0x36, 0xEC, 0xDB, 0x76, 0xDB, 0xD6, 0xED, 0xDB, 
+  0x76, 0xDB, 0xD6, 0xED, 0xDB, 0x0E, 0xDB, 0x30, 0xEC, 0xFF, 0xFF, 0xFF, 
+  0xFF, 0xFF, };
 
 // 8X9 (Celsius)
 static const uint8_t u8g_celsius_bits[] U8X8_PROGMEM = {
-	0b01000000,
-	0b10100110,
-	0b01001001,
-	0b00001000,
-	0b00001000,
-	0b00001000,
-	0b00001000,
-	0b00001001,
-	0b00000110
+	0b00000010,
+	0b01100101,
+	0b10010010,
+	0b00010000,
+	0b00010000,
+	0b00010000,
+	0b00010000,
+	0b10010000,
+	0b01100000
 };
 
 //16X18
 static const uint8_t u8g_bigCelsius_bits[] U8X8_PROGMEM = {
-	0b01110000,0b00000000,
-	0b11011000,0b00011110,
-	0b10001000,0b01111111,
-	0b11011001,0b11110001,
-	0b01110001,0b11000000,
-	0b00000011,0b10000000,
-	0b00000011,0b10000000,
-	0b00000111,0b00000000,
-	0b00000111,0b00000000,
-	0b00000111,0b00000000,
-	0b00000111,0b00000000,
-	0b00000111,0b00000000,
-	0b00000111,0b00000000,
-	0b00000011,0b10000000,
-	0b00000011,0b11000000,
-	0b00000001,0b11100001,
+	0b00001110,0b00000000,
+	0b00011011,0b01111000,
+	0b00010001,0b11111110,
+	0b10011011,0b10001111,
+	0b10001110,0b00000011,
+	0b11000000,0b00000001,
+	0b11000000,0b00000001,
+	0b11100000,0b00000000,
+	0b11100000,0b00000000,
+	0b11100000,0b00000000,
+	0b11100000,0b00000000,
+	0b11100000,0b00000000,
+	0b11100000,0b00000000,
+	0b11000000,0b00000001,
+	0b11000000,0b00000011,
+	0b10000000,0b10000111,
 	0b00000000,0b11111111,
-	0b00000000,0b00111110
+	0b00000000,0b01111100
 };
 
 //10X10
 static const uint8_t u8g_autoStepNotActive_bits[] U8X8_PROGMEM = {
-	0b01010101,0b01000000,
-	0b10000000,0b00000000,
-	0b00000000,0b01000000,
-	0b10000000,0b00000000,
-	0b00000000,0b01000000,
-	0b10000000,0b00000000,
-	0b00000000,0b01000000,
-	0b10000000,0b00000000,
-	0b00000000,0b01000000,
-	0b10101010,0b10000000
+	0b10101010,0b00000010,
+	0b00000001,0b00000000,
+	0b00000000,0b00000010,
+	0b00000001,0b00000000,
+	0b00000000,0b00000010,
+	0b00000001,0b00000000,
+	0b00000000,0b00000010,
+	0b00000001,0b00000000,
+	0b00000000,0b00000010,
+	0b01010101,0b00000001
 };
 
+/*
 // 4X6 (1,2,3)
 static const uint8_t u8g_autoStep_bits[3][6] U8X8_PROGMEM = {
 	{0b00100000,
@@ -120,7 +111,7 @@ static const uint8_t u8g_autoStep_bits[3][6] U8X8_PROGMEM = {
 	 0b00010000,
 	 0b11110000}
 };
-
+*/
 /*
 // 4X6 (2)
 static const uint8_t u8g_autoStep2_bits[] U8X8_PROGMEM = {
@@ -146,7 +137,7 @@ static const uint8_t u8g_autoStep3_bits[] U8X8_PROGMEM = {
 // Draw initial menu with selected item (1 - Auto, 2 - Manual)
 void drawMenu_AutoManual(uint8_t sel) {
 	u8g2.clearBuffer();
-	u8g2.setFontMode(1);  // activate transparent font mode
+	//u8g2.setFontMode(1);  // activate transparent font mode
 	if(sel==1){
 		u8g2.drawRBox(0,4,51,25,4);
 		u8g2.drawRFrame(55,4,73,25,4);
@@ -155,7 +146,6 @@ void drawMenu_AutoManual(uint8_t sel) {
 		u8g2.drawRBox(55,4,73,25,4);
 	}
 	u8g2.setFont(u8g2_font_t0_22_mf);
-	u8g2.setDrawColor(2);	// Xor
 	u8g2.drawStr(3,24,"Auto");
 	u8g2.drawStr(59,24,"Manual");
 	u8g2.sendBuffer();
@@ -163,25 +153,26 @@ void drawMenu_AutoManual(uint8_t sel) {
 
 // this routine is a part of other routine, so no sendBuffer...
 void printManual(){
-	u8g2.setDrawColor(1);	// invert bitmap
 	u8g2.drawXBMP( 0, 0, 40, 10, u8g_manual_bits);
 }
 
 // this routine is a part of other routine, so no sendBuffer...	
 void printPresetTemperature(){
 	u8g2.setFont(u8g2_font_profont12_tn);	//numeric font for preset temperature and timer
-	u8g2.setDrawColor(2);	// Xor mode
-	u8g2.setCursor(52, 10);
+	//u8g2.setFontMode(1);
+	u8g2.setCursor(48, 9);
 	uint16_t curval=(int)setPoint;
 	u8g2.print(curval);
-	uint16_t tmpcoord = 52+5*(curval<100 ? 2 : 3);	// two or three digits number
-	u8g2.drawXBMP(tmpcoord, 0, 40, 10, u8g_celsius_bits);
+	uint16_t tmpcoord = 50+6*(curval<100 ? 2 : 3);	// two or three digits number
+	u8g2.setBitmapMode(1);
+	u8g2.drawXBMP(tmpcoord, 0, 8, 9, u8g_celsius_bits);
 }
 
 // this routine is a part of other routine, so no sendBuffer...	
 // mm:ss
 void printTime(uint16_t t) {
-	u8g2.setCursor(90, 10);
+	//u8g2.setFontMode(1);
+	u8g2.setCursor(87, 9);
 	t = t % 3600;	// cut off hours
 	uint8_t m = t / 60;
 	uint8_t s = t % 60;
@@ -197,22 +188,19 @@ void printNumber00(uint8_t n) {
 
 void printHeaterState(){
 	if(digitalRead(MOSFET_PIN)){
-		u8g2.drawXBMP( 120, 0, 8, 14, u8g_clear_bits);
-		digitalWrite(LED_PIN, LOW);
+		u8g2.drawXBMP( 120, 0, 8, 10, u8g_heating_bits);
 	}else{
-		u8g2.drawXBMP( 120, 0, 8, 14, u8g_heating_bits);
-		digitalWrite(LED_PIN, HIGH);
+		u8g2.drawXBMP( 120, 0, 8, 10, u8g_clear_bits);
 	}
 }
 
 // this routine is a part of other routine, so no sendBuffer...	
 void printCurrentTemperature(){
-	u8g2.setFont(u8g2_font_t0_22_tn);	//numeric font for current temperature
-	u8g2.setDrawColor(1);	// Normal mode
+	u8g2.setFont(u8g2_font_timR18_tn);	//numeric font for current temperature
 	u8g2.setCursor(0, 31);
 	uint16_t curval=round(currentTemp);
 	u8g2.print(curval);
-	uint16_t tmpcoord = 10*(curval<100 ? 2 : 3);	// two or three digits number
+	uint16_t tmpcoord = 12*(curval<100 ? 2 : 3)+2;	// two or three digits number
 	u8g2.drawXBMP(tmpcoord, 13, 16, 18, u8g_bigCelsius_bits);
 }
 
@@ -238,7 +226,6 @@ void printAutoStateBox(uint8_t x, uint8_t y, uint8_t step, uint8_t type){
 // 0 - dotted box
 // 1 - solid line box
 // 2 - filled box
-	u8g2.setDrawColor(2);	// xor mode
 	switch (type) {
 		case 0:
 			u8g2.drawXBMP(x, y, 10, 10, u8g_autoStepNotActive_bits);
@@ -250,20 +237,11 @@ void printAutoStateBox(uint8_t x, uint8_t y, uint8_t step, uint8_t type){
 			u8g2.drawBox(x, y, 10,10);
 	}
 	// print step number (range: 0-2)
-	u8g2.drawXBMP(x+3, y+2, 4, 6, u8g_autoStep_bits[step][0]);
-	/*
-	switch (step) {
-		case 1:
-			u8g2.drawXBMP(x, y, 10, 10, u8g_autoStep1_bits);
-			break;
-		case 2:
-			u8g2.drawXBMP(x, y, 10, 10, u8g_autoStep2_bits);
-			break;
-		case 3:
-			u8g2.drawXBMP(x, y, 10, 10, u8g_autoStep3_bits);
-	}
-	*/
-	u8g2.setDrawColor(1);	// set color back to normal
+	u8g2.setFont(u8g2_font_5x7_tn);	//numeric font for step numbers
+	//u8g2.setFontMode(1);
+	u8g2.setCursor(x+3,y+8);
+	u8g2.print(step+1);
+	
 	
 }
 	

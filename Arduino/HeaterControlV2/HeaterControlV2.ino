@@ -3,7 +3,7 @@
 //*********************
 //#define DEBUG	// output the results to Serial
 #define OLED	// Use OLED display
-#define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
+//#define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
 #define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
 //*********************
 
@@ -67,8 +67,8 @@ PID myPID(&currentTemp, &outputVal, &setPoint, 0, 0, 0, DIRECT); // PID values w
 unsigned long timer_millis;
 int timer_seconds;
 boolean timer_active=false;
-unsigned long timer_editable_millis;
-boolean timer_editable=false;
+uint8_t value_editable=0;	// Edit Preset temperature or Timer on the fly (0 - nothing editable, 1 - Preset Temp, 2 - Timer)
+unsigned long value_editable_millis;
 
 
 #ifdef DEBUG
@@ -93,6 +93,8 @@ void setup(){
 	
 	#ifdef OLED
 		u8g2.begin();
+		u8g2.setDrawColor(2);	// Xor is default mode across all sketch.
+		u8g2.setFontMode(1);	// Or is default mode
 	#endif
 	
 	#ifdef DEBUG
@@ -220,9 +222,6 @@ void loop() {
 		timer_millis=millis();
 		if(timer_active){timer_seconds+=(ControlType==0 ? seconds_passed : -seconds_passed);} // increment only in manual mode.
 	}
-	#ifdef OLED
-	printHeaterState(); //print icon of the heater ON/OFF state
-	#endif
 
 }
 
@@ -246,16 +245,10 @@ void doManualReflow(){
 		if(encVal!=127 && encVal!=0) {
 			manual_temp = constrain(manual_temp+encVal,20,300);
 			setPoint = manual_temp;
-			#ifdef DEBUG
-			Serial.print(F("manual_temp changed to: "));Serial.println(manual_temp);
-			#endif
 		}else if(encVal==127){
 			H_OFF	// turn off heater, because we will freeze here for some time...
 			// if button is pressed - store manual temp setting
 			writeEEPROMint(EEPROM_MANUAL_TEMP,manual_temp);
-			#ifdef DEBUG
-			Serial.print(F("Store manual_temp to EEPROM: "));Serial.println(manual_temp);
-			#endif
 			waitUntilButtonReleased();
 		}
 	}
@@ -266,6 +259,9 @@ void doManualReflow(){
 	printPresetTemperature();
 	printTime(timer_seconds);
 	printCurrentTemperature();
+
+	printHeaterState(); //print icon of the heater ON/OFF state
+
 	u8g2.sendBuffer();
 	#endif
 	#ifdef LOGGER
@@ -281,28 +277,30 @@ void doAutoReflow(){
 	char encVal = 127;  // signed value - just enter to the loop
 	while (encVal == 127) { //loop here while button is pressed (waiting longer than 2 seconds will reset the board (Exit to the init menu).
 		encVal = rotaryEncRead();
-		if(encVal!=127) {
+		if(encVal!=127 && value_editable>0) {
 			val_adjust = encVal;
 		}else if(encVal==127){
 			H_OFF	// turn off heater, because we will freeze here for some time...
 			waitUntilButtonReleased();
-			timer_editable = !timer_editable;	// change timer edit mode
-			timer_editable_millis=millis();		// start timer for edit time within 3 seconds
+			value_editable++;	// change edit mode
+			if(value_editable>2){value_editable=0;}
+			value_editable_millis=millis();		// start timer for edit time within 3 seconds
 		}
 	}
 
 	// adjust current temperature or timer
 	if(val_adjust!=0 && ControlType<5){
-		if(timer_editable){
+		val_adjust*=10; // adjust in 10's steps
+		if(value_editable==2){
 			timer_seconds=constrain(timer_seconds+val_adjust,0,990);
-			timer_editable_millis=millis();
-		}else{
+		}else if(value_editable==1){
 			setPoint=constrain((int)setPoint+val_adjust,20,300);
 		}
+		value_editable_millis=millis();
 	}
 	// reset timer_editable flag if edit time expired
-	if(timer_editable && timer_editable_millis+3000<millis()) {
-		timer_editable=false;
+	if(value_editable>0 && value_editable_millis+3000<millis()) {
+		value_editable=0;
 	}
 	
 	
@@ -348,17 +346,16 @@ void doAutoReflow(){
 	#ifdef OLED
 	u8g2.clearBuffer();
 	printAuto();
-	printPresetTemperature();
-	if(timer_editable){
-		u8g2.setDrawColor(2);	// Xor mode
-		u8g2.drawBox(89,0,24,11);
-		printTime(timer_seconds);
-		u8g2.setDrawColor(1);	// Normal mode
-	}else{
-		printTime(timer_seconds);
+	if(value_editable==1){
+		u8g2.drawBox(46,0,33,10);
+	}else if(value_editable==2){
+		u8g2.drawBox(85,0,33,10);
 	}
+	printPresetTemperature();
+	printTime(timer_seconds);
 	printCurrentTemperature();
-	
+	printHeaterState(); //print icon of the heater ON/OFF state
+
 	u8g2.sendBuffer();
 	#endif
 }

@@ -34,6 +34,8 @@ void logger128secOLED(){
 				loggerPrintNumbers(curTmp, setPnt);
 				//u8g2.drawPixel(loggerXcoord,constrain(loggerYCoord,0,31));
 				u8g2.drawLine(constrain(loggerXcoord-1,0,127),loggerYcoordPrev,loggerXcoord,loggerYCoord);
+				u8g2.setDrawColor(2);	// restore XOR mode
+				u8g2.setFontMode(1);	// restore font mode
 				#endif
 				#ifdef DEBUG
 				Serial.print("DRAW ");
