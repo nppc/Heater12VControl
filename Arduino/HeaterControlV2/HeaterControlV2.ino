@@ -3,7 +3,6 @@
 //*********************
 //#define DEBUG	// output the results to Serial
 #define OLED	// Use OLED display
-//#define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
 //#define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
 //*********************
 
@@ -255,6 +254,10 @@ void doManualReflow(){
 	printPresetTemperature();
 	printTime(timer_seconds);
 	printCurrentTemperature();
+
+	inlineLogger_fill();
+	inlineLogger_draw();
+		
 	printHeaterState(); //print icon of the heater ON/OFF state
 
 	u8g2.sendBuffer();
