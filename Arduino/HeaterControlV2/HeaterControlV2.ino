@@ -3,7 +3,7 @@
 //*********************
 //#define DEBUG	// output the results to Serial
 #define OLED	// Use OLED display
-#define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
+//#define LOGGER	// Temporary screen for visual representation of temperature change (for PID tuning)
 //#define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
 //*********************
 
@@ -50,7 +50,9 @@ uint8_t ControlType;		// 0 - Manual or 1 - Auto
 // PID global variables
 #define PID_WINDOWSIZE 500	// upper limit of PID output
 #define PID_ABSTEMPDIFFERENCE 10	// Difference in set and current temperature when PID should not work.
-#define PID_VALUES_FACTOR 10.0	//PID values are stored in EEPROM in int format. So, scale them (div/mult) before use.
+#define PID_P_FACTOR 1.0	//PID values are stored in EEPROM in int format. So, scale them (div) before use.
+#define PID_I_FACTOR 10.0	//PID values are stored in EEPROM in int format. So, scale them (div) before use.
+#define PID_D_FACTOR 1.0	//PID values are stored in EEPROM in int format. So, scale them (div) before use.
 
 double currentTemp=0;
 double setPoint=0;
@@ -59,7 +61,7 @@ double outputVal;
 int pid_P, pid_I, pid_D; // PID values
 int auto_preheatTemp, auto_preheatTime, auto_reflowTemp, auto_reflowTime, manual_temp;
 
-unsigned long soft_pwm_millis=0;
+unsigned long soft_pwm_millis;
 
 //input/output variables passed by reference, so they are updated automatically
 PID myPID(&currentTemp, &outputVal, &setPoint, 0, 0, 0, DIRECT); // PID values will be set later
@@ -107,7 +109,7 @@ void setup(){
 		// read PID values from EEPROM
 	restore_settingsEEPROM();
 	// we use FACTOR for PID values to get rid of comas in interface.
-	myPID.SetTunings((float)pid_P / PID_VALUES_FACTOR,(float)pid_I / PID_VALUES_FACTOR,(float)pid_D / PID_VALUES_FACTOR);
+	myPID.SetTunings((float)pid_P / PID_P_FACTOR,(float)pid_I / PID_I_FACTOR,(float)pid_D / PID_D_FACTOR);
 	myPID.SetOutputLimits(0, PID_WINDOWSIZE);	//set PID output range
 
 	initEncoder();
@@ -170,6 +172,8 @@ void setup(){
 	#ifdef VIRTUALTEMPERATURE
 		currentTemp=setPoint-PID_ABSTEMPDIFFERENCE*2;
 	#endif
+	
+	soft_pwm_millis = millis()-50000;	// Before turning on the heater wait for some seconds
 		
 }
 
@@ -177,15 +181,6 @@ void loop() {
 	
 	// Exit by holding button for 2 seconds...
 	WDT_Init();	// keep system alive
-	
-	if(ControlType==0){
-		adjustValues(1);	//adjust values on the fly (only preset temp to adjust)
-		doManualReflow();
-	}else{
-		adjustValues(2);	//adjust values on the fly (adjust both, preset temp and timer)
-		doAutoReflow();
-	}
-
 	
 	#ifdef VIRTUALTEMPERATURE
 	if (virtualTemperature_ms+1000 < millis()) {
@@ -207,6 +202,14 @@ void loop() {
 		outputVal = (setPoint > currentTemp ? PID_WINDOWSIZE : 0); // ON/OFF control
 	}
 	doSoftwarePWM((uint16_t)outputVal);	// make slow PWM to prevent unnecessary mosfet heating 
+
+	if(ControlType==0){
+		adjustValues(1);	//adjust values on the fly (only preset temp to adjust)
+		doManualReflow();
+	}else{
+		adjustValues(2);	//adjust values on the fly (adjust both, preset temp and timer)
+		doAutoReflow();
+	}
 	
 	// debug 
 	#ifdef DEBUG
