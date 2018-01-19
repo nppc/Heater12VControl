@@ -1,2 +1,2 @@
-#define filterSamples   31
+#define filterSamples   25
 uint16_t BSmoothArray[filterSamples];

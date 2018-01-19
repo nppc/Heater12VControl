@@ -36,8 +36,8 @@ void inlineLogger_draw(){
 	for(uint8_t i=0;i<60;i+=4){
 		u8g2.drawPixel(LOGGER_XPOS+i,LOGGER_YPOS);
 	}
-	u8g2.drawXBMP(127-9, LOGGER_YPOS-2-5, 9, 5, u8g_plus10_bits);
-	u8g2.drawXBMP(127-9, LOGGER_YPOS+2, 9, 5, u8g_minus10_bits);
+	u8g2.drawXBMP(127-9, LOGGER_YPOS-3-5, 9, 5, u8g_plus10_bits);
+	u8g2.drawXBMP(127-9, LOGGER_YPOS+3, 9, 5, u8g_minus10_bits);
 	for(uint8_t i=0;i<60;i++){
 		byte tmpVal=logvalues[i];
 		if(tmpVal!=127){

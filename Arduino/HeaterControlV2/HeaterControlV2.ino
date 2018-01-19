@@ -98,9 +98,9 @@ void setup(){
 		u8g2.setFontMode(1);	// Or is default mode
 	#endif
 	
+	for(uint8_t i=0;i<filterSamples*2;i++){digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);}
+	
 	#ifdef DEBUG
-		//initialize ADC smoother array for Debug output here...
-		for(uint8_t i=0;i<filterSamples*2;i++){digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);}
 		Serial.print(F("Temperature Sensor: "));
 		Serial.println(analog2temp(digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray)));
 	#endif
@@ -124,17 +124,18 @@ void setup(){
 	#endif
 	char encVal = 0;  // signed value - nothing is pressed
 	while (encVal != 127) {
+		#ifdef OLED
+		drawMenu_AutoManual(ControlType);
+		#endif
 		encVal = rotaryEncRead();
 		if(encVal!=127 && encVal!=0) {
 			if(encVal>0){ControlType=0;}else{ControlType=1;}
-			#ifdef OLED
-			drawMenu_AutoManual(ControlType);
-			#endif
 			#ifdef DEBUG
 			Serial.print(F("ControlType is: "));Serial.println(ControlType);
 			#endif
 		}
-		digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray); // refresh ADC array to have fresh values there
+		uint16_t smoothADC = digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);
+		currentTemp = analog2temp(smoothADC);
 	}
 	EEPROM.update(EEPROM_CONTROLTYPE,ControlType);	// store selected Control Type for the next time
 	#ifdef OLED

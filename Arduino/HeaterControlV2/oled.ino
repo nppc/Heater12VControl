@@ -150,17 +150,24 @@ static const uint8_t u8g_cool_txt_bits[] U8X8_PROGMEM = {
 void drawMenu_AutoManual(uint8_t sel) {
 	u8g2.clearBuffer();
 	u8g2.setDrawColor(1);
+	u8g2.drawXBMP(3, 5, 8, 9, u8g_celsius_bits);
+	uint16_t curval=(int)currentTemp;
+	uint16_t tmpcoord = (curval<100 ? 3 : 0);	// two or three digits number
+	u8g2.setCursor(tmpcoord, 27);
+	u8g2.setFont(u8g2_font_profont12_tn);	//numeric font for preset temperature and timer
+	u8g2.print(curval);
+
 	if(sel==1){
-		u8g2.drawRBox(0,4,51,25,4);
-		u8g2.drawRFrame(55,4,73,25,4);
+		u8g2.drawRBox(0+22,4,51,25,4);
+		u8g2.drawRFrame(55+22,4,51,25,4);
 	}else{
-		u8g2.drawRFrame(0,4,51,25,4);
-		u8g2.drawRBox(55,4,73,25,4);
+		u8g2.drawRFrame(0+22,4,51,25,4);
+		u8g2.drawRBox(55+22,4,51,25,4);
 	}
 	u8g2.setDrawColor(2);	// restore default mode
 	u8g2.setFont(u8g2_font_t0_22_mf);
-	u8g2.drawStr(3,24,"Auto");
-	u8g2.drawStr(59,24,"Manual");
+	u8g2.drawStr(3+22,24,"Auto");
+	u8g2.drawStr(59+22,24,"Man.");
 	u8g2.sendBuffer();
 }
 
