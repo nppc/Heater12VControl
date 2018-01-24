@@ -8,7 +8,7 @@ static const uint8_t u8g_plus10_bits[] U8X8_PROGMEM = { 0xD0, 0x01, 0x52, 0x01, 
 static const uint8_t u8g_minus10_bits[] U8X8_PROGMEM = { 0xD0, 0x01, 0x50, 0x01, 0x57, 0x01, 0x50, 0x01, 0xD0, 0x01, };
 
 unsigned long loggerMillis=millis();
-byte logvalues[59];	// 60 elements (-127:+127)
+byte logvalues[60];	// 60 elements (-127:+127)
 byte loggerXcoord=0;
 
 	
