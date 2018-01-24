@@ -152,6 +152,7 @@ uint16_t getValueForConfigItem(uint8_t item) {
 			break;
 		case 7: // Reflow time in seconds
 			return auto_reflowTime;
+			break;
 		case 8: // Manual target temperature
 			return manual_temp;
 	} 

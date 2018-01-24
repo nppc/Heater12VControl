@@ -105,7 +105,7 @@ void setup(){
 		Serial.println(analog2temp(digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray)));
 	#endif
 	
-		// read PID values from EEPROM
+	// read PID values from EEPROM
 	restore_settingsEEPROM();
 	// we use FACTOR for PID values to get rid of comas in interface.
 	myPID.SetTunings((float)pid_P / PID_P_FACTOR,(float)pid_I / PID_I_FACTOR,(float)pid_D / PID_D_FACTOR);
