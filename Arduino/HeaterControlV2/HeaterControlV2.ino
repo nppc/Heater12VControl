@@ -4,6 +4,7 @@
 //#define DEBUG	// output the results to Serial
 #define OLED	// Use OLED display
 //#define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
+//#define SOFTRESET	// If your Arduino has broken bootloader (watchdog is not working) then enable this dirty trick or better - flash optiboot to your arduino.
 //*********************
 
 

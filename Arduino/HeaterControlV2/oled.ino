@@ -1,10 +1,6 @@
 #ifdef OLED
-//8X14
+//8X10
 static const uint8_t u8g_clear_bits[] U8X8_PROGMEM = {
-	0b00000000,
-	0b00000000,
-	0b00000000,
-	0b00000000,
 	0b00000000,
 	0b00000000,
 	0b00000000,
