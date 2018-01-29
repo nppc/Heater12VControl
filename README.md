@@ -1,9 +1,10 @@
 # Heater12VControl
 Controller board (mosfet and thermistor control) for 12V heating ceramic element with temperature PID control
+![Device assembled](Images/ReflowPlate.jpg)
 
 ### We will need:
 - 1 Heating element like XD-JR80 12V48W
-- 1 Thermistor 100K NTC 3950
+- 1 Thermistor 100K NTC 3950 (from 3D printer)
 - 1 Arduino Nano
 - 1 Rotary Encoder like EC11
 - 1 OLED 128x32 with I2c

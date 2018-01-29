@@ -1,14 +1,18 @@
 $fn=50;
 
+/*
 Box();
-
 translate([-7.5,-33,-5])case_mountinghole();
 translate([-24,-8,-5])rotate([0,0,-90])case_mountinghole();
 translate([0,33,-5])rotate([0,0,180])case_mountinghole();
 
 translate([-15,-33,10.5])rotate([0,0,90])linear_extrude(height = 0.5){text("REFLOW", $fn = 20, size = 4.5, font = "ArialBlack");}
+*/
 
-//cylinder(d=4, h=6);
+smallHole=1.13;
+projection(cut=false)rotate([180,0,90])heaterBase();
+//translate([-8,28,-20])rotate([180,0,90])heaterBase();
+
 
 module Box(){
 difference(){
@@ -93,3 +97,37 @@ module case_mountinghole(){
     }
 }
 
+module heaterBase(){
+    color("BROWN")difference(){
+        hull(){
+            translate([130/2-4,45/2-4,0])cylinder(d=8,h=10);
+            translate([-130/2+4,45/2-4,0])cylinder(d=8,h=10);
+            translate([130/2-4,-45/2+4,0])cylinder(d=8,h=10);
+            translate([-130/2+4,-45/2+4,0])cylinder(d=8,h=10);
+        }
+        translate([42,0,0]){
+            holesCeramicHold();
+        }
+        translate([-28,-8,0]){
+            rotate([0,0,-90]){
+                holesPlasticCase(40,2.5);
+                holesPlasticCase(40,5);
+            }
+        }
+    }
+}
+
+
+module holesCeramicHold(){
+    translate([0,41/2,0])cylinder(d=smallHole,h=25, center=true);
+    translate([-41/2,10,0])cylinder(d=smallHole,h=25, center=true);
+    translate([0,-41/2,0])cylinder(d=smallHole,h=25, center=true);
+    translate([-41/2,-10,0])cylinder(d=smallHole,h=25, center=true);
+    translate([41/2,0,0])cylinder(d=smallHole,h=25, center=true);
+}
+
+module holesPlasticCase(hght,diam){
+    translate([-7.5,-33,-5])cylinder(d=diam,h=hght, center=true);
+    translate([-24,-8,-5])cylinder(d=diam,h=hght, center=true);
+    translate([0,33,-5])cylinder(d=diam,h=hght, center=true);
+}
