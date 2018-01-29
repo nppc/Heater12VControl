@@ -1,6 +1,17 @@
-# Heater12VControl
-Controller board (mosfet and thermistor control) for 12V heating ceramic element with temperature PID control
+# uReflow Station
+Micro Reflow Station with 12V heating ceramic element and temperature PID control.
+
 ![Device assembled](Images/ReflowPlate.jpg)
+The device is only 13cm long. Heating plate is 4x4cm. Power is 12VDC.
+
+## 2 modes of operation: Manual and Automatic.
+In Manual mode preset temperature is maintained. The temperature can be adjusted on the fly.
+In Automatic mode the device is following general reflow thermal profile.
+
+![Virtual PCB](Images/ReflowTempProfile.jpg)
+Example of reflow soldering thermal profile (from Wikipedia)
+
+Every parameter can be adjusted (Soak and reflow temperature and time). Preset can be configured and stored in EEPROM and can be adjusted on the fly.
 
 ### We will need:
 - 1 Heating element like XD-JR80 12V48W
@@ -12,6 +23,7 @@ Controller board (mosfet and thermistor control) for 12V heating ceramic element
 - And some other smd components
 - PCB from OSHPark: https://oshpark.com/shared_projects/yKbu7gQC
 
+Controller board (OLED, rotary encoder, mosfet control and thermistor monitor):
 ![Virtual PCB](Images/CeramicHeaterNewPCB.jpg)
 ![PCB soldered](Images/PCB_soldered.jpg)
 
