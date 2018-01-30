@@ -64,3 +64,5 @@ Controller board (OLED, rotary encoder, mosfet control and thermistor monitor):
 - Reflow temperature
 - Reflow time
 - Target temperature for Manual mode
+
+Discussion here: https://www.rcgroups.com/forums/showthread.php?2998269-DIY-reflow-soldering-ceramic-plate
