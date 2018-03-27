@@ -3,6 +3,7 @@
 Symbol | Component | Package | Mouser Part No
 ---- | ------------ | ------------ | ------------
 Q1 | AON6403 or similar | DFN5X6 | Aliexpress
+Q2 | SI2312 or similar | SOT23 | 781-SI2312CDS-T1-GE3
 R1 | 100K | SMD 0603 | 603-RC0603FR-07100KL
 R2 |   1K | SMD 0603 | 603-RC0603FR-071KL
 R3 |  10K | SMD 0603 | 603-RC0603FR-0710KL
