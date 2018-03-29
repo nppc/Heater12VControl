@@ -1,16 +1,3 @@
-
-
-int collectADCraw(uint8_t sensor) {
-	int sumADC;
-	sumADC = analogRead(sensor);	// dummy read
-	sumADC = 0;
-	for (uint8_t i = 0; i < OVERSAMPLENR; i++) {
-		sumADC+=analogRead(sensor);
-	}
-	return sumADC;
-}
-
-
 // smooth algorytm for ADC reading
 uint16_t digitalSmooth(uint16_t rawIn, uint16_t *sensSmoothArray){     // "int *sensSmoothArray" passes an array to the function - the asterisk indicates the array name is a pointer
   uint16_t j, k, temp, top, bottom;

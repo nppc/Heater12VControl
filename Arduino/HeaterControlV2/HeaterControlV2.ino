@@ -2,13 +2,17 @@
 // * HW CONFIGURATION *
 //*********************
 //#define DEBUG	// output the results to Serial
+
+// Enable only one of the temperature sensors
+//#define MAX31855
+#define MAX6675
+//#define NTC // using Temperature table
+
 #define OLED	// Use OLED display
 //#define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
 //#define SOFTRESET	// If your Arduino has broken bootloader (watchdog is not working) then enable this dirty trick or better - flash optiboot to your arduino.
 //*********************
 
-
-#include "temperature.h"
 #include "encoder.h"
 #include "adc.h"
 #include <PID_v1.h>
@@ -99,11 +103,11 @@ void setup(){
 		u8g2.setFontMode(1);	// Or is default mode
 	#endif
 	
-	for(uint8_t i=0;i<filterSamples*2;i++){digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);}
-	
+	Temperature_init();
+		
 	#ifdef DEBUG
 		Serial.print(F("Temperature Sensor: "));
-		Serial.println(analog2temp(digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray)));
+		Serial.println(getTemperature());
 	#endif
 	
 	// read PID values from EEPROM
@@ -135,8 +139,7 @@ void setup(){
 			Serial.print(F("ControlType is: "));Serial.println(ControlType);
 			#endif
 		}
-		uint16_t smoothADC = digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);
-		currentTemp = analog2temp(smoothADC);
+		currentTemp = getTemperature();
 	}
 	EEPROM.update(EEPROM_CONTROLTYPE,ControlType);	// store selected Control Type for the next time
 	#ifdef OLED
@@ -191,8 +194,7 @@ void loop() {
 		if(!virtualTemperature_Direction && currentTemp<setPoint-PID_ABSTEMPDIFFERENCE-1){virtualTemperature_Direction=true;}
 	}
 	#else
-	uint16_t smoothADC = digitalSmooth(collectADCraw(TEMPSENSOR_PIN), BSmoothArray);
-	currentTemp = analog2temp(smoothADC);
+	currentTemp = getTemperature();
 	#endif
 
 	
