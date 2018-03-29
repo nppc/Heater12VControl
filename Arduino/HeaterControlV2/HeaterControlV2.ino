@@ -5,8 +5,8 @@
 
 // Enable only one of the temperature sensors
 //#define MAX31855
-#define MAX6675
-//#define NTC // using Temperature table
+//#define MAX6675
+#define NTC // using Temperature table
 
 #define OLED	// Use OLED display
 //#define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected

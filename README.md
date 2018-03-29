@@ -23,6 +23,8 @@ Every parameter can be adjusted (Soak and reflow temperature and time). Preset c
 - And some other smd components
 - PCB from OSHPark: https://oshpark.com/shared_projects/yKbu7gQC
 
+I have added to the firmware support for K type thermocouple (MAX31855 or MAX6675), but made no PCB for this. I left it up to your creativity. :)
+
 Controller board (OLED, rotary encoder, mosfet control and thermistor monitor):
 ![Virtual PCB](Images/CeramicHeaterNewPCB.jpg)
 ![PCB soldered](Images/PCB_soldered.jpg)

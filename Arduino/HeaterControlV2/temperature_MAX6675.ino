@@ -1,7 +1,7 @@
 #ifdef MAX6675
-	#define MAXSCK_PIN  8
-	#define MAXCS_PIN   7
-	#define MAXDO_PIN   6
+	#define MAXSCK_PIN  7
+	#define MAXCS_PIN   8
+	#define MAXDO_PIN   9
 
 	unsigned long max6675_ms = millis();
 	float lastTemperature = 0;
