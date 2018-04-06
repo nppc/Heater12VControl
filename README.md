@@ -56,7 +56,7 @@ Controller board (OLED, rotary encoder, mosfet control and thermistor monitor):
 (Cooling down step)
 ![PCB soldered](Images/30cool.jpg)
 
-### Configurable parameters
+## Configurable parameters
 (long button press while in start menu)
 - PID P
 - PID I
@@ -66,5 +66,10 @@ Controller board (OLED, rotary encoder, mosfet control and thermistor monitor):
 - Reflow temperature
 - Reflow time
 - Target temperature for Manual mode
+
+## Compiling with Arduino
+You can use latest Arduino IDE.
+And need to include two libraries via Arduino IDE Libraries Manager
+![Arduino Libraries](Images/ArduinoLibraries.png)
 
 Discussion here: https://www.rcgroups.com/forums/showthread.php?2998269-DIY-reflow-soldering-ceramic-plate
