@@ -33,13 +33,13 @@ void configureParams(){
 					case 4:	// Preheat temperature
 						auto_preheatTemp = constrain(auto_preheatTemp+encVal,20,300);
 						break;
-					case 5: // Preheat time in seconds
+					case 5: // Preheat time in seconds or minutes
 						auto_preheatTime = constrain(auto_preheatTime+encVal*10,10,990);
 						break;
 					case 6: // Reflow temperature
 						auto_reflowTemp = constrain(auto_reflowTemp+encVal,20,300);
 						break;
-					case 7: // Reflow time in seconds
+					case 7: // Reflow time in seconds or minutes
 						auto_reflowTime = constrain(auto_reflowTime+encVal*10,10,990);
 						break;
 					case 8: // Manual temperature
@@ -100,13 +100,21 @@ void printConfParam(uint8_t item, boolean edit){
 			u8g2.print(F("Soak t"));
 			break;
 		case 5: // Preheat time in seconds
-			u8g2.print(F("Soak s"));
+      #ifdef TIMER_MINUTES
+        u8g2.print(F("Soak m"));
+      #else
+        u8g2.print(F("Soak s"));
+      #endif
 			break;
 		case 6: // Reflow temperature
 			u8g2.print(F("Reflow t"));
 			break;
 		case 7: // Reflow time in seconds
-			u8g2.print(F("Reflow s"));
+      #ifdef TIMER_MINUTES
+  			u8g2.print(F("Reflow m"));
+      #else
+        u8g2.print(F("Reflow s"));
+      #endif
 			break;
 		case 8: // Manual target temperature
 			u8g2.print(F("Manual t"));
