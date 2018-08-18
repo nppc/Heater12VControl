@@ -11,6 +11,7 @@
 #define OLED	// Use OLED display
 //#define VIRTUALTEMPERATURE	//For debug purposes, when temp sensor is disconnected
 //#define SOFTRESET	// If your Arduino has broken bootloader (watchdog is not working) then enable this dirty trick or better - flash optiboot to your arduino.
+//#define TIMER_MINUTES // Count in minutes/hours. If not defined then seconds/minutes
 //*********************
 
 #include "encoder.h"
@@ -40,7 +41,11 @@
 
 // RAMP can always be 3 deg per second
 
-
+#ifdef TIMER_MINUTES
+  #define TIMER_DIVIDER = 1000 * 60
+#else
+  #define TIMER_DIVIDER = 1000
+#endif
 
 // ADC=1023 - temp sensor is not connected
 
@@ -72,7 +77,7 @@ unsigned long soft_pwm_millis;
 PID myPID(&currentTemp, &outputVal, &setPoint, 0, 0, 0, DIRECT); // PID values will be set later
 
 unsigned long timer_millis;
-int timer_seconds;
+int timer_counter;
 boolean timer_active=false;
 uint8_t value_editable=0;	// Edit Preset temperature or Timer on the fly (0 - nothing editable, 1 - Preset Temp, 2 - Timer)
 unsigned long value_editable_millis;
@@ -170,7 +175,7 @@ void setup(){
 		#endif
 	}
 
-	timer_seconds=0;
+	timer_counter=0;
 	timer_active=false;
 
 	myPID.SetMode(AUTOMATIC); // turn on PID
@@ -190,7 +195,7 @@ void loop() {
 	WDT_Init();	// keep system alive
 	
 	#ifdef VIRTUALTEMPERATURE
-	if (virtualTemperature_ms+1000 < millis()) {
+	if (virtualTemperature_ms+TIMER_DIVIDER < millis()) {
 		virtualTemperature_ms = millis();
 		currentTemp += (virtualTemperature_Direction ? 0.4: -0.4);
 		if(virtualTemperature_Direction && currentTemp>setPoint+PID_ABSTEMPDIFFERENCE){virtualTemperature_Direction=false;}
@@ -224,15 +229,15 @@ void loop() {
 		Serial.print(F("Set: "));Serial.print(setPoint);
 		Serial.print(F(", Actual: "));Serial.print(currentTemp);
 		Serial.print(F(", PWM: "));Serial.print(outputVal);
-		Serial.print(F(", Timer: "));Serial.println(timer_seconds);
+		Serial.print(F(", Timer: "));Serial.println(timer_counter);
 	}	
 	#endif	
 	
 	// increment or decrement timer
-	if(timer_millis+1000<millis()) {
-		uint16_t seconds_passed=(millis()-timer_millis)/1000;
+	if(timer_millis+TIMER_DIVIDER<millis()) {
+		uint16_t seconds_passed=(millis()-timer_millis)/TIMER_DIVIDER;
 		timer_millis=millis();
-		if(timer_active){timer_seconds+=(ControlType==0 ? seconds_passed : -seconds_passed);} // increment only in manual mode.
+		if(timer_active){timer_counter+=(ControlType==0 ? seconds_passed : -seconds_passed);} // increment only in manual mode.
 	}
 
 }
@@ -259,7 +264,7 @@ void doManualReflow(){
 	}
 
 	printPresetTemperature();
-	printTime(timer_seconds);
+	printTime(timer_counter);
 	printCurrentTemperature();
 
 	inlineLogger_fill();
@@ -283,14 +288,14 @@ void doAutoReflow(){
 			// setpoint is already set...
 			// wait until temperature is reached the auto_preheatTemp. Then go to the next step
 			if(currentTemp>=(setPoint-2)){
-				timer_seconds=auto_preheatTime;
+				timer_counter=auto_preheatTime;
 				timer_active=true;
 				ControlType=2;	// go to the next step
 			}
 			break;
 		case 2:	// wait for timer
-			if(timer_seconds<=0){
-				timer_seconds=0;
+			if(timer_counter<=0){
+				timer_counter=0;
 				timer_active=false;
 				setPoint=auto_reflowTemp;	// set temperature for next step
 				ControlType=3;	// go to the next step
@@ -299,14 +304,14 @@ void doAutoReflow(){
 		case 3:	// ramp to reflow temperature
 			// wait until temperature is reached the auto_preheatTemp. Then go to the next step
 			if(currentTemp>=(setPoint-2)){
-				timer_seconds=auto_reflowTime;
+				timer_counter=auto_reflowTime;
 				timer_active=true;
 				ControlType=4;	// go to the next step
 			}
 			break;
 		case 4:	// wait for timer
-			if(timer_seconds<=0){
-				timer_seconds=0;
+			if(timer_counter<=0){
+				timer_counter=0;
 				timer_active=false;
 				setPoint=20;	// Cool down
         digitalWrite(FAN_PIN,HIGH);
@@ -329,7 +334,7 @@ void doAutoReflow(){
 		u8g2.drawBox(85,0,33,10);
 	}
 	printPresetTemperature();
-	printTime(timer_seconds);
+	printTime(timer_counter);
 	printCurrentTemperature();
 	printHeaterState(); //print icon of the heater ON/OFF state
 	
@@ -358,7 +363,7 @@ void adjustValues(uint8_t vals) {
 	if(val_adjust!=0 && ControlType<5){
 		val_adjust*=10; // adjust in 10's steps
 		if(value_editable==2){
-			timer_seconds=constrain(timer_seconds+val_adjust,0,990);
+			timer_counter=constrain(timer_counter+val_adjust,0,990);
 		}else if(value_editable==1){
 			setPoint=constrain((int)setPoint+val_adjust,20,300);
 		}
