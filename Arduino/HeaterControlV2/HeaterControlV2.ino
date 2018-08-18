@@ -35,6 +35,7 @@
 #define encoderPinB   4 // Interrupt pin (coupled with capacitor to GND)
 #define BUTTON_PIN   12 // Pin for knob button
 
+#define FAN_PIN   2 // FAN for cooling stage
 
 
 // RAMP can always be 3 deg per second
@@ -91,6 +92,8 @@ void setup(){
 	wdt_disable();
 	pinMode(MOSFET_PIN,OUTPUT);
 	pinMode(LED_PIN,OUTPUT);
+  pinMode(FAN_PIN,OUTPUT);
+  digitalWrite(FAN_PIN,LOW);
 	H_OFF
 
 	#ifdef DEBUG
@@ -306,11 +309,15 @@ void doAutoReflow(){
 				timer_seconds=0;
 				timer_active=false;
 				setPoint=20;	// Cool down
+        digitalWrite(FAN_PIN,HIGH);
 				ControlType=5;	// go to the next step
 			}
 			break;
 		case 5:	// wait for cooling down
-			if(currentTemp<50){ControlType=6;}	// on the next step do nothing
+			if(currentTemp<50){
+			  ControlType=6; // on the next step do nothing
+        digitalWrite(FAN_PIN,LOW);
+			}	
 	}	
 
 	#ifdef OLED
