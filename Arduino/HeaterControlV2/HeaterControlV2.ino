@@ -42,9 +42,9 @@
 // RAMP can always be 3 deg per second
 
 #ifdef TIMER_MINUTES
-  #define TIMER_DIVIDER = 1000 * 60
+  #define TIMER_DIVIDER 1000 * 60
 #else
-  #define TIMER_DIVIDER = 1000
+  #define TIMER_DIVIDER 1000
 #endif
 
 // ADC=1023 - temp sensor is not connected
