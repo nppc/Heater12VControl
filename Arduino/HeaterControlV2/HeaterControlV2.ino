@@ -255,7 +255,7 @@ void doSoftwarePWM(uint16_t pwm_val){
 
 void doManualReflow(){
 	// draw screen
-	#if defined (OLED) && !defined (LOGGER)
+	#if defined (OLED)
 	u8g2.clearBuffer();
 	printManual();
 
@@ -273,9 +273,6 @@ void doManualReflow(){
 	printHeaterState(); //print icon of the heater ON/OFF state
 
 	u8g2.sendBuffer();
-	#endif
-	#ifdef LOGGER
-	logger128secOLED();
 	#endif
 	
 	if(currentTemp>=(setPoint-2)){timer_active=true;} else {timer_active=false;}	// Timer running if temperature near or reached preset temp.
@@ -314,14 +311,15 @@ void doAutoReflow(){
 				timer_counter=0;
 				timer_active=false;
 				setPoint=20;	// Cool down
-        digitalWrite(FAN_PIN,HIGH);
+				digitalWrite(FAN_PIN,HIGH);
 				ControlType=5;	// go to the next step
 			}
 			break;
 		case 5:	// wait for cooling down
 			if(currentTemp<50){
-			  ControlType=6; // on the next step do nothing
-        digitalWrite(FAN_PIN,LOW);
+				//ControlType=6; // on the next step do nothing
+				digitalWrite(FAN_PIN,LOW);
+				while(1){}	// reboot board - exit to menu
 			}	
 	}	
 
