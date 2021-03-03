@@ -235,7 +235,7 @@ void loop() {
 	
 	// increment or decrement timer
 	if(timer_millis+TIMER_DIVIDER<millis()) {
-		uint16_t seconds_passed=(millis()-timer_millis)/TIMER_DIVIDER;
+		uint16_t seconds_passed=(uint16_t)((unsigned long)(millis()-timer_millis)/TIMER_DIVIDER);
 		timer_millis=millis();
 		if(timer_active){timer_counter+=(ControlType==0 ? seconds_passed : -seconds_passed);} // increment only in manual mode.
 	}
