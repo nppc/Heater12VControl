@@ -42,7 +42,7 @@
 // RAMP can always be 3 deg per second
 
 #ifdef TIMER_MINUTES
-  #define TIMER_DIVIDER (1000 * 60)
+  #define TIMER_DIVIDER (uint16_t)(1000 * 60)
 #else
   #define TIMER_DIVIDER 1000
 #endif
@@ -287,6 +287,7 @@ void doAutoReflow(){
 			if(currentTemp>=(setPoint-2)){
 				timer_counter=auto_preheatTime;
 				timer_active=true;
+				timer_millis = millis(); // reset timer
 				ControlType=2;	// go to the next step
 			}
 			break;
@@ -303,6 +304,7 @@ void doAutoReflow(){
 			if(currentTemp>=(setPoint-2)){
 				timer_counter=auto_reflowTime;
 				timer_active=true;
+				timer_millis = millis(); // reset timer
 				ControlType=4;	// go to the next step
 			}
 			break;
